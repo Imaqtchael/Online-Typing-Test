@@ -4,27 +4,107 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/index.css">
-    <script src="js/index.js" type="module" defer></script>
+    <link rel="stylesheet" href="css/highlight-within-textarea.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js" defer></script>
+    <script src="js/highlight-within-textarea.js" defer></script>
+    <script src="js/index.js" defer></script>
+    <script src="js/chart.js" defer></script>
+    <script src="https://kit.fontawesome.com/aa188ef300.js" crossorigin="anonymous"></script>
     <title>Typing Test ⌨ | Michael Justin Barcenas</title>
 </head>
 
 <body>
-    <nav>
-        <p>Online Typing Test</p>
-    </nav>
-    <div class="body">
-        <div class="word-count">
-            <p>59/100</p>
+    <div class="whole">
+        <nav>
+            <p>Typing Test</p>
+            <div class="nav-buttons">
+                <button id="typing-test" title="Show typing test"><i class="fa-solid fa-keyboard"></i></button>
+                <button id="history" title="Show typing history"><i class="fa-solid fa-clock"></i></button>
+            </div>
+        </nav>
+        <div id="body" class="body">
+            <div class="game-settings">
+                <input type="radio" id="mode" name="settings" checked>
+                <label for="mode">
+                    <i class="fa-solid fa-hashtag"></i>
+                    mode
+                </label>
+                <input type="radio" id="word" name="settings">
+                <label for="word">
+                    <i class="fa-solid fa-font"></i>
+                    words
+                </label>
+                <span id="mode-input">
+                    <input type="radio" name="mode" id="paragraph" value="paragraph" checked>
+                    <label for="paragraph">paragraph</label>
+                    <input type="radio" name="mode" id="random" value="random">
+                    <label for="random">random</label>
+                </span>
+                <span id="word-input">
+                    <input type="number" id="words-input" class="textbox-control" value="1">
+                </span>
+            </div>
+            <div class="word-count">
+                <p><span id="typed-word"></span>/<span id="word-total"></span></p>
+                <p>accuracy: <span id="accuracy-text"></span>%</p>
+                <p>wpm: <span id="wpm-text"></span></p>
+            </div>
+            <div class="paragraph">
+                <textarea rows="3" spellcheck="false"></textarea>
+            </div>
+            <div class="paragraph-buttons">
+                <button id="next-button"><i class="fa-solid fa-chevron-right"></i></button>
+                <button id="restart-button"><i class="fa-solid fa-rotate"></i></button>
+            </div>
+            <div class="legends">
+                <div class="legend">
+                    <p class="block">tab</p>
+                    <p>+</p>
+                    <p class="block">enter</p>
+                    <p>- next test</p>
+                </div>
+                <div class="legend">
+                    <p class="block">tab</p>
+                    <p>+</p>
+                    <p class="block">tab</p>
+                    <p>+</p>
+                    <p class="block">enter</p>
+                    <p>- restart test</p>
+                </div>
+            </div>
         </div>
-        <div class="paragraph">
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium nam officiis voluptate, est consequuntur quia nesciunt sapiente repellat. Cupiditate assumenda quia eligendi natus aliquid! Perferendis nostrum deserunt iusto consequatur
-                laboriosam.
-            </p>
+        <div id="history-body">
+            <canvas id="accuracy"></canvas>
+            <canvas id="wpm"></canvas>
         </div>
+        <div class="contacts">
+            <a href="https://www.facebook.com/Imaqtchael" target="_blank">
+                <div class="links">
+                    <i class="fa-brands fa-facebook-f"></i>
+                    <p>Facebook</p>
+                </div>
+            </a>
+            <a href="http://www.linkedin.com" target="_blank">
+                <div class="links"><i class="fa-brands fa-linkedin-in"></i>
+                    <p>LinkedIn</p>
+                </div>
+            </a>
+            <a href="http://www.github.com/Imaqtchael" target="_blank">
+                <div class="links"><i class="fa-brands fa-github"></i>
+                    <p>Github</p>
+                </div>
+            </a>
+            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=mjbarcenas.official@gmail.com" target="_blank">
+                <div class="links"><i class="fa-solid fa-envelope"></i>
+                    <p>Gmail</p>
+                </div>
+            </a>
+        </div>
+        <footer>
+            <p>Project by: Michael Justin Barcenas</p>
+        </footer>
     </div>
-    <footer>
-        <p>Project by: Michael Justin Barcenas</p>
-    </footer>
 </body>
 
 </html>

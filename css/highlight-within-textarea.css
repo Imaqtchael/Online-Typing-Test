@@ -1,0 +1,71 @@
+/* Highlighting css here */
+
+.hwt-container {
+    display: inline-block;
+    position: relative;
+    overflow: hidden !important;
+    -webkit-text-size-adjust: none !important;
+    background-color: #f8f9fa;
+    width: 100%;
+}
+
+.hwt-backdrop {
+    position: absolute !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    overflow: hidden !important;
+    width: 100%;
+}
+
+.hwt-highlights {
+    width: auto !important;
+    height: auto !important;
+    border-color: transparent !important;
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+    color: transparent !important;
+    overflow: hidden !important;
+}
+
+.hwt-input {
+    display: block !important;
+    position: relative !important;
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+    font: inherit;
+    overflow: hidden !important;
+}
+
+.hwt-content {
+    background: none transparent !important;
+    resize: none;
+    border: none;
+    width: 100%;
+    outline: none;
+    font-size: 1.8rem;
+    caret-color: var(--tertiary-color);
+    overflow: hidden;
+}
+
+.hwt-content mark {
+    padding: 0 !important;
+    border-radius: 2px;
+    z-index: 1;
+    position: relative;
+    background-color: transparent;
+}
+
+.hwt-content mark.correct {
+    color: var(--header-color);
+}
+
+.hwt-content mark.wrong {
+    background-color: red;
+    color: var(--header-color);
+}
+
+.hwt-content mark.default {
+    color: var(--text-color);
+}
