@@ -10,17 +10,33 @@ function generateParagraph() {
     wordButton.insertBefore(icon, wordButton.firstChild);
 
     let words = document.querySelector("#words-input").value;
-    $.get("//metaphorpsum.com/paragraphs/1/" + words + "/", function(result) {
-        toBeTyped = result;
-        toBeTypedWordCount = toBeTyped.split(" ").length;
+    $.ajax({
+        url: "//metaphorpsum.com/paragraphs/1/" + words + "/",
+        type: "GET",
+        dataType: "text",
+        success: function(result) {
+            toBeTyped = result;
+            toBeTypedWordCount = toBeTyped.split(" ").length;
 
-        let wordTotalSpan = document.querySelector("#word-total");
-        wordTotalSpan.textContent = toBeTypedWordCount;
+            let wordTotalSpan = document.querySelector("#word-total");
+            wordTotalSpan.textContent = toBeTypedWordCount;
 
-        let textarea = document.querySelector("textarea");
-        textarea.value = toBeTyped;
-        resetTypingTest();
+            let textarea = document.querySelector("textarea");
+            textarea.value = toBeTyped;
+            resetTypingTest();
+        }
     });
+    // $.get("//metaphorpsum.com/paragraphs/1/" + words + "/", function(result) {
+    //     toBeTyped = result;
+    //     toBeTypedWordCount = toBeTyped.split(" ").length;
+
+    //     let wordTotalSpan = document.querySelector("#word-total");
+    //     wordTotalSpan.textContent = toBeTypedWordCount;
+
+    //     let textarea = document.querySelector("textarea");
+    //     textarea.value = toBeTyped;
+    //     resetTypingTest();
+    // });
 }
 
 function generateRandom() {
