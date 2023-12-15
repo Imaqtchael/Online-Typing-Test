@@ -295,10 +295,6 @@ textarea.addEventListener("keydown", function(event) {
         wpmList.push(wpm);
         wpmListTries.push(wpmList.length);
 
-        console.clear();
-        console.log(accuracyList, accuracyListTries);
-        console.log(wpmList, wpmListTries);
-
         wpmChart.update();
         accuracyChart.update();
     } else {
