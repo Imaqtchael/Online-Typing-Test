@@ -10,7 +10,7 @@ function generateParagraph() {
     wordButton.insertBefore(icon, wordButton.firstChild);
 
     let words = document.querySelector("#words-input").value;
-    $.get("http://metaphorpsum.com/paragraphs/1/" + words, function(result) {
+    $.get("http://metaphorpsum.com/paragraphs/1/" + words + "/", function(result) {
         toBeTyped = result;
         toBeTypedWordCount = toBeTyped.split(" ").length;
 
