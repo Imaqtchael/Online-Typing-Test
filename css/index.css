@@ -219,11 +219,17 @@ nav button:hover>i {
 .paragraph-buttons>button {
     border: none;
     outline: none;
+    height: 2rem;
+    width: 4rem;
+    border-radius: 2px;
 }
 
-.paragraph-buttons>button:hover>i,
-.paragraph-buttons>button:focus>i {
+.paragraph-buttons>button:hover>i {
     color: var(--header-color);
+}
+
+.paragraph-buttons>button:focus {
+    outline: 2px solid var(--header-color);
 }
 
 .paragraph-buttons>button>i {
