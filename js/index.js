@@ -5,22 +5,54 @@ function getRandomInteger(min, max) {
 let wordButton = document.querySelector("label[for='word']");
 let icon = wordButton.firstElementChild;
 
-function generateParagraph() {
-    wordButton.textContent = " sentences";
+function fetchQuote() {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            method: 'GET',
+            url: 'https://api.api-ninjas.com/v1/quotes?',
+            headers: { 'X-Api-Key': 'pETqGO2l1uJeufMoO6942w==KtfqSvf1pA6zVgC8' },
+            contentType: 'application/json',
+            success: function(result) {
+                resolve(result[0].quote);
+            },
+            error: function ajaxError(jqXHR) {
+                reject(jqXHR.responseText);
+            }
+        });
+    });
+}
+
+async function generateQuote() {
+    wordButton.textContent = " quotes";
     wordButton.insertBefore(icon, wordButton.firstChild);
 
     let words = document.querySelector("#words-input").value;
-    $.get("http://metaphorpsum.com/paragraphs/1/" + words, function(result) {
-        toBeTyped = result;
-        toBeTypedWordCount = toBeTyped.split(" ").length;
+    let initial = [];
+    for (let i = 0; i < words; i++) {
+        let result = await fetchQuote();
+        initial.push(result);
+    }
 
-        let wordTotalSpan = document.querySelector("#word-total");
-        wordTotalSpan.textContent = toBeTypedWordCount;
+    toBeTyped = initial.join(" ");
+    toBeTypedWordCount = toBeTyped.split(" ").length;
 
-        let textarea = document.querySelector("textarea");
-        textarea.value = toBeTyped;
-        resetTypingTest();
-    });
+    let wordTotalSpan = document.querySelector("#word-total");
+    wordTotalSpan.textContent = toBeTypedWordCount;
+
+    let textarea = document.querySelector("textarea");
+    textarea.value = toBeTyped;
+    resetTypingTest();
+    // $.get("//metaphorpsum.com/paragraphs/1/" + words + "/", function(result) {
+    //     toBeTyped = result;
+    //     toBeTypedWordCount = toBeTyped.split(" ").length;
+
+    //     let wordTotalSpan = document.querySelector("#word-total");
+    //     wordTotalSpan.textContent = toBeTypedWordCount;
+
+    //     let textarea = document.querySelector("textarea");
+    //     textarea.value = toBeTyped;
+    //     resetTypingTest();
+    // });
 }
 
 function generateRandom() {
@@ -56,7 +88,7 @@ function showHistory() {
 function generateNewTypingTest() {
     let activeRadioButton = document.querySelector("input[name='mode']:checked");
     if (activeRadioButton.value == "paragraph") {
-        generateParagraph();
+        generateQuote();
     } else {
         generateRandom();
     }
@@ -125,7 +157,7 @@ showTypingTestButton.addEventListener("click", showTypingTest);
 showHistoryButton.addEventListener("click", showHistory);
 
 let paragraphButton = document.querySelector("#paragraph");
-paragraphButton.addEventListener("click", generateParagraph);
+paragraphButton.addEventListener("click", generateQuote);
 
 let randomButton = document.querySelector("#random");
 randomButton.addEventListener("click", generateRandom);
@@ -263,10 +295,6 @@ textarea.addEventListener("keydown", function(event) {
         wpmList.push(wpm);
         wpmListTries.push(wpmList.length);
 
-        console.clear();
-        console.log(accuracyList, accuracyListTries);
-        console.log(wpmList, wpmListTries);
-
         wpmChart.update();
         accuracyChart.update();
     } else {
@@ -277,4 +305,4 @@ textarea.addEventListener("keydown", function(event) {
     textarea.focus();
 });
 
-generateParagraph();
+generateQuote();
