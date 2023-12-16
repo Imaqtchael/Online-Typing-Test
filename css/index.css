@@ -88,6 +88,7 @@ nav button:hover>i {
 }
 
 .body .game-settings {
+    margin-top: auto;
     background-color: var(--secondary-color);
     height: 5rem;
     display: flex;
@@ -242,6 +243,7 @@ nav button:hover>i {
 }
 
 .legends {
+    margin-top: auto;
     display: flex;
     flex-direction: column;
     gap: .5rem;
