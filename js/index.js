@@ -223,11 +223,12 @@ textarea.addEventListener("contextmenu", function(event) {
 });
 textarea.addEventListener("keydown", function(event) {
     event.preventDefault();
-    console.log(event.key);
+
     if (event.key == "Tab") {
         document.querySelector("#next-button").focus();
         return;
     }
+
     if (typingFinished || ["Shift", "Enter", "Escape", "CapsLock", "Control", "Alt", "Meta", "ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp"].includes(event.key)) {
         return;
     }

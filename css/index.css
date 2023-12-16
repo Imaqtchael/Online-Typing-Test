@@ -49,10 +49,14 @@ nav {
 }
 
 nav p {
-    font-weight: 500;
+    font-weight: bolder;
     color: var(--header-color);
     flex: 0 1 auto;
     font-size: var(--header-size);
+}
+
+nav span {
+    color: var(--tertiary-color);
 }
 
 nav .nav-buttons {
