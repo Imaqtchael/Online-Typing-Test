@@ -295,7 +295,6 @@ textarea.addEventListener("keydown", function(event) {
         }]
     })
 
-    let typedWords = userInput.split(" ").length - 1;
     if (userInput == toBeTyped) {
         typingFinished = true;
         startedTyping = false;
@@ -317,6 +316,7 @@ textarea.addEventListener("keydown", function(event) {
         wpmChart.update();
         accuracyChart.update();
     } else {
+        let typedWords = userInput.split(" ").length - 1;
         wordCount.textContent = typedWords;
     }
 
