@@ -23,6 +23,7 @@ function fetchQuote() {
 }
 
 async function generateQuote() {
+    showLoading();
     wordButton.textContent = " quotes";
     wordButton.insertBefore(icon, wordButton.firstChild);
 
@@ -41,6 +42,7 @@ async function generateQuote() {
 
     let textarea = document.querySelector("textarea");
     textarea.value = toBeTyped;
+    hideLoading();
     resetTypingTest();
     // $.get("//metaphorpsum.com/paragraphs/1/" + words + "/", function(result) {
     //     toBeTyped = result;
@@ -71,6 +73,20 @@ function generateRandom() {
         textarea.value = toBeTyped;
         resetTypingTest();
     });
+}
+
+function showLoading() {
+    let paragraph = document.querySelector(".paragraph");
+    paragraph.style.display = "none";
+    let loading = document.querySelector("#loading");
+    loading.style.display = "flex";
+}
+
+function hideLoading() {
+    let paragraph = document.querySelector(".paragraph");
+    paragraph.style.display = "flex";
+    let loading = document.querySelector("#loading");
+    loading.style.display = "none";
 }
 
 function showTypingTest() {
@@ -131,7 +147,7 @@ function resetTypingTest() {
             highlight: [correctInput + wrongInput, toBeTyped.length],
             className: "default"
         }]
-    })
+    });
 
     textarea.blur();
     textarea.focus();
@@ -229,7 +245,7 @@ textarea.addEventListener("keydown", function(event) {
         return;
     }
 
-    if (typingFinished || ["Shift", "Enter", "Escape", "CapsLock", "Control", "Alt", "Meta", "ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp"].includes(event.key)) {
+    if ((userInput.length == toBeTyped.length && !typingFinished && event.key != "Backspace") || typingFinished || ["Shift", "Enter", "Escape", "CapsLock", "Control", "Alt", "Meta", "ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp"].includes(event.key)) {
         return;
     }
 

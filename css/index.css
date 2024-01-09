@@ -79,7 +79,8 @@ nav button:hover>i {
     color: var(--header-color);
 }
 
-.body {
+.body,
+#multiplayer-body {
     flex: 1 1 auto;
     display: flex;
     flex-direction: column;
@@ -180,7 +181,7 @@ nav button:hover>i {
     padding: .5rem;
 }
 
-.body .paragraph {
+.paragraph {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -189,7 +190,7 @@ nav button:hover>i {
     width: 100%;
 }
 
-.body .paragraph textarea {
+.paragraph textarea {
     resize: none;
     border: none;
     width: 100%;
@@ -200,16 +201,9 @@ nav button:hover>i {
     z-index: 0;
 }
 
-.body .paragraph textarea::selection {
+.paragraph textarea::selection {
     background: var(--primary-color);
     color: var(--text-color);
-}
-
-.body .paragraph span:nth-child(2) {
-    display: inline-block;
-    width: 2px;
-    animation: blink 1s step-end infinite;
-    border-left: 2px solid var(--tertiary-color);
 }
 
 .paragraph-buttons {
@@ -235,6 +229,10 @@ nav button:hover>i {
 
 .paragraph-buttons>button:focus {
     outline: 2px solid var(--header-color);
+}
+
+.paragraph-buttons>button:active {
+    outline: none;
 }
 
 .paragraph-buttons>button>i {
@@ -309,4 +307,60 @@ footer {
     flex: 0 1 fit-content;
     text-align: center;
     user-select: all;
+}
+
+#loading {
+    display: none;
+}
+
+#multiplayer-loading {
+    display: flex;
+}
+
+#multiplayer-body div:not(:first-child) {
+    width: 100%;
+}
+
+.enemy-div .paragraph textarea {}
+
+.loader {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    position: relative;
+    animation: rotate 1s linear infinite;
+}
+
+.loader::before {
+    content: "";
+    box-sizing: border-box;
+    position: absolute;
+    inset: 0px;
+    border-radius: 50%;
+    border: 5px solid var(--tertiary-color);
+    animation: prixClipFix 2s linear infinite;
+}
+
+@keyframes rotate {
+    100% {
+        transform: rotate(360deg)
+    }
+}
+
+@keyframes prixClipFix {
+    0% {
+        clip-path: polygon(50% 50%, 0 0, 0 0, 0 0, 0 0, 0 0)
+    }
+    25% {
+        clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 0, 100% 0, 100% 0)
+    }
+    50% {
+        clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 100% 100%, 100% 100%)
+    }
+    75% {
+        clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 0 100%, 0 100%)
+    }
+    100% {
+        clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 0 100%, 0 0)
+    }
 }
