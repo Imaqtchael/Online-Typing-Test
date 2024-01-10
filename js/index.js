@@ -22,6 +22,14 @@ function fetchQuote() {
     });
 }
 
+function fetchRandom(words) {
+    return new Promise(resolve => {
+        $.get("https://random-word-api.herokuapp.com/word?number=" + words, function(data) {
+            resolve(data);
+        });
+    });
+}
+
 async function generateQuote() {
     showLoading();
     wordButton.textContent = " quotes";
@@ -57,22 +65,23 @@ async function generateQuote() {
     // });
 }
 
-function generateRandom() {
+async function generateRandom() {
+    showLoading();
     wordButton.textContent = " words";
     wordButton.insertBefore(icon, wordButton.firstChild);
 
     let words = parseInt(document.querySelector("#words-input").value);
-    $.get("https://random-word-api.herokuapp.com/word?number=" + words, function(result) {
-        toBeTyped = result.join(" ");
-        toBeTypedWordCount = toBeTyped.split(" ").length;
+    toBeTyped = await fetchRandom(words);
+    toBeTyped = toBeTyped.join(" ");
+    toBeTypedWordCount = toBeTyped.split(" ").length;
 
-        let wordTotalSpan = document.querySelector("#word-total");
-        wordTotalSpan.textContent = toBeTypedWordCount;
+    let wordTotalSpan = document.querySelector("#word-total");
+    wordTotalSpan.textContent = toBeTypedWordCount;
 
-        let textarea = document.querySelector("textarea")
-        textarea.value = toBeTyped;
-        resetTypingTest();
-    });
+    let textarea = document.querySelector("textarea")
+    textarea.value = toBeTyped;
+    hideLoading();
+    resetTypingTest();
 }
 
 function showLoading() {
@@ -92,6 +101,7 @@ function hideLoading() {
 function showTypingTest() {
     typingTestBody.style.display = "flex";
     historyBody.style.display = "none";
+    multiplayerBody.style.display = "none";
 
     textarea.focus();
 }
@@ -99,6 +109,7 @@ function showTypingTest() {
 function showHistory() {
     historyBody.style.display = "flex";
     typingTestBody.style.display = "none";
+    multiplayerBody.style.display = "none";
 }
 
 function generateNewTypingTest() {
@@ -166,8 +177,10 @@ function hideWPMAccuracy() {
 
 let showTypingTestButton = document.querySelector("#typing-test");
 let showHistoryButton = document.querySelector("#history");
+let showMultiplayerButton = document.querySelector("#multiplayer");
 let typingTestBody = document.querySelector("#body");
 let historyBody = document.querySelector("#history-body");
+let multiplayerBody = document.querySelector("#multiplayer-body");
 
 showTypingTestButton.addEventListener("click", showTypingTest);
 showHistoryButton.addEventListener("click", showHistory);
@@ -324,4 +337,7 @@ textarea.addEventListener("keydown", function(event) {
     textarea.focus();
 });
 
-generateQuote();
+let urlParams = new URLSearchParams(window.location.search);
+if (!urlParams.has("code")) {
+    generateQuote();
+}

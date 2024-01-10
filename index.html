@@ -10,6 +10,7 @@
     <script src="js/highlight-within-textarea.js" defer></script>
     <script src="js/index.js" defer></script>
     <script src="js/chart.js" defer></script>
+    <script src="js/multiplayer.js" type="module" defer></script>
     <script src="https://kit.fontawesome.com/aa188ef300.js" crossorigin="anonymous"></script>
     <title>keybored | Michael Justin Barcenas</title>
 </head>
@@ -78,9 +79,13 @@
                 </div>
             </div>
         </div>
-        <div id="multiplayer-body" style="display: none">
-            <div id="multiplayer-loading">
-                <span class="loader"></span>
+        <div id="multiplayer-body">
+            <div class="code-popup">
+                <div class="code-body">
+                    <p>Send this link to your friend:</p>
+                    <input id="multiplayer-link" type="text" readonly>
+                    <button id="copy-url-button">copy</button>
+                </div>
             </div>
             <div id="enemy-div">
                 <div class="paragraph">
