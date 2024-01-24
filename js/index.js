@@ -42,7 +42,7 @@ async function generateQuote() {
         initial.push(result);
     }
 
-    toBeTyped = initial.join(" ");
+    toBeTyped = initial.join(" ").trim();
     toBeTypedWordCount = toBeTyped.split(" ").length;
 
     let wordTotalSpan = document.querySelector("#word-total");
@@ -72,7 +72,7 @@ async function generateRandom() {
 
     let words = parseInt(document.querySelector("#words-input").value);
     toBeTyped = await fetchRandom(words);
-    toBeTyped = toBeTyped.join(" ");
+    toBeTyped = toBeTyped.join(" ").trim();
     toBeTypedWordCount = toBeTyped.split(" ").length;
 
     let wordTotalSpan = document.querySelector("#word-total");
