@@ -357,6 +357,12 @@ let logsChartDetails = {
                     autoSkip: true,
                     maxTicksLimit: 10
                 }
+            }],
+            yAxes: [{
+                ticks: {
+                    autoSkip: true,
+                    maxTicksLimit: 5
+                }
             }]
         },
         tooltips: {
