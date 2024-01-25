@@ -105,7 +105,13 @@ function showTypingTest() {
     historyBody.style.display = "none";
     multiplayerBody.style.display = "none";
 
-    textarea.focus();
+    if (textarea.offsetParent == null) {
+        console.log("next");
+        nextButton.focus();
+    } else {
+        console.log("textarea");
+        textarea.focus();
+    }
 }
 
 function showHistory() {
@@ -128,7 +134,9 @@ function startTimer() {
         secondsPassed += 1;
 
         let wpm = Math.floor((correctInput / 5) * (60 / secondsPassed));
+        let raw = Math.floor((input / 5) * (60 / secondsPassed));
         currentWPM.push(wpm);
+        currentRawWPM.push(raw);
         currentTimeStamps.push(secondsPassed);
 
         if (secondsPassed >= 300) {
@@ -143,6 +151,7 @@ function stopTimer() {
 
 function resetTypingTest() {
     userInput = "";
+    input = 0;
     correctInput = 0;
     wrongInput = 0;
     totalWrongInput = 0;
@@ -150,6 +159,7 @@ function resetTypingTest() {
     startedTyping = false;
     secondsPassed = 0;
     currentWPM.length = 0;
+    currentRawWPM.length = 0;
     currentTimeStamps.length = 0;
     stopTimer();
     wordCount.textContent = 0;
@@ -198,13 +208,13 @@ function updateLogChart() {
 
     let parent = document.querySelector("#test-logs");
     parent.removeChild(parent.firstElementChild);
+
     let logElement = document.createElement("canvas");
     logElement.id = "wpm_accuracy";
     parent.appendChild(logElement);
 
     logChart = new Chart("wpm_accuracy", { type: "line", data: logsChartDetails.data, options: logsChartDetails.options });
 
-    console.log(currentTimeStamps);
 }
 
 let showTypingTestButton = document.querySelector("#typing-test");
@@ -261,6 +271,7 @@ let logChart;
 let userInput = "";
 let toBeTyped = "";
 let toBeTypedWordCount = 0;
+let input = 0;
 let correctInput = 0;
 let wrongInput = 0;
 let totalWrongInput = 0;
@@ -269,6 +280,7 @@ let accuracyListTries = [];
 let wpmList = [];
 let wpmListTries = [];
 let currentWPM = [];
+let currentRawWPM = [];
 let currentTimeStamps = [];
 let oneTimeWrongInput = 0;
 let typingFinished = false;
@@ -285,6 +297,7 @@ let logsChartDetails = {
     data: {
         labels: currentTimeStamps,
         datasets: [{
+            label: "wpm",
             fill: false,
             backgroundColor: "rgba(226, 183, 20, 1.0)",
             borderColor: "rgba(226, 183, 20, 0.5)",
@@ -299,6 +312,22 @@ let logsChartDetails = {
             stepped: true,
             tension: 0.3,
             data: currentWPM
+        }, {
+            label: "raw",
+            fill: false,
+            backgroundColor: "rgba(209, 208, 197, 1.0)",
+            borderColor: "rgba(209, 208, 197, 0.5)",
+            pointRadius: 2,
+            pointHoverRadius: 5,
+            pointBackgroundColor: function(context) {
+                let maximumValueIndex = context.dataset.data.indexOf(Math.max(...context.dataset.data));
+                let minimumValueIndex = context.dataset.data.indexOf(Math.min(...context.dataset.data));
+                let index = context.dataIndex;
+                return maximumValueIndex == index ? "red" : minimumValueIndex == index ? "rgb(100, 102, 105, 1.0)" : "rgb(209, 208, 197, 1.0)";
+            },
+            stepped: true,
+            tension: 0.3,
+            data: currentRawWPM
         }]
     },
     options: {
@@ -315,6 +344,14 @@ let logsChartDetails = {
                     maxTicksLimit: 10
                 }
             }]
+        },
+        tooltips: {
+            mode: 'index',
+            intersect: false
+        },
+        hover: {
+            mode: 'index',
+            intersect: false
         },
         responsive: true,
         maintainAspectRatio: true
@@ -393,6 +430,7 @@ textarea.addEventListener("keydown", function(event) {
 
         let accuracy = totalWrongInput == 0 ? 100 : Math.floor(((toBeTyped.length - totalWrongInput) / toBeTyped.length) * 100);
         let wpm = Math.floor((toBeTyped.length / 5) * (60 / secondsPassed));
+        let raw = Math.floor((input / 5) * (60 / secondsPassed))
 
         accuracyText.textContent = accuracy;
         wpmText.textContent = wpm;
@@ -402,6 +440,7 @@ textarea.addEventListener("keydown", function(event) {
         accuracyListTries.push(accuracyList.length);
         wpmList.push(wpm);
         wpmListTries.push(wpmList.length);
+        currentRawWPM.push(raw);
 
         currentWPM.push(wpm);
         currentTimeStamps.push((currentTimeStamps.length - 1) + 1)
@@ -416,6 +455,7 @@ textarea.addEventListener("keydown", function(event) {
 
     textarea.blur();
     textarea.focus();
+    input += 1;
 });
 
 let urlParams = new URLSearchParams(window.location.search);

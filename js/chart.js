@@ -3,11 +3,12 @@ let accuracyChart = new Chart("accuracy", {
     data: {
         labels: accuracyListTries,
         datasets: [{
+            label: "accuracy",
             fill: false,
             backgroundColor: "rgba(209, 208, 197, 1.0)",
             borderColor: "rgba(226, 183, 20, 0.5)",
-            pointRadius: 3,
-            pointHoverRadius: 6,
+            pointRadius: 2,
+            pointHoverRadius: 5,
             pointBackgroundColor: function(context) {
                 let maximumValueIndex = context.dataset.data.indexOf(Math.max(...context.dataset.data));
                 let minimumValueIndex = context.dataset.data.indexOf(Math.min(...context.dataset.data));
@@ -33,7 +34,21 @@ let accuracyChart = new Chart("accuracy", {
                     max: 110,
                     min: 0
                 }
+            }],
+            xAxes: [{
+                ticks: {
+                    autoSkip: true,
+                    maxTicksLimit: 10
+                }
             }]
+        },
+        tooltips: {
+            mode: 'index',
+            intersect: false
+        },
+        hover: {
+            mode: 'index',
+            intersect: false
         },
         responsive: true,
         maintainAspectRatio: true
@@ -45,11 +60,12 @@ let wpmChart = new Chart("wpm", {
     data: {
         labels: wpmListTries,
         datasets: [{
+            label: "wpm",
             fill: false,
             backgroundColor: "rgba(226, 183, 20, 1.0)",
             borderColor: "rgba(209, 208, 197, 0.5)",
-            pointRadius: 3,
-            pointHoverRadius: 6,
+            pointRadius: 2,
+            pointHoverRadius: 5,
             pointBackgroundColor: function(context) {
                 let maximumValueIndex = context.dataset.data.indexOf(Math.max(...context.dataset.data));
                 let minimumValueIndex = context.dataset.data.indexOf(Math.min(...context.dataset.data));
@@ -68,6 +84,22 @@ let wpmChart = new Chart("wpm", {
         title: {
             display: true,
             text: "words per minute history"
+        },
+        scales: {
+            xAxes: [{
+                ticks: {
+                    autoSkip: true,
+                    maxTicksLimit: 10
+                }
+            }]
+        },
+        tooltips: {
+            mode: 'index',
+            intersect: false
+        },
+        hover: {
+            mode: 'index',
+            intersect: false
         },
         responsive: true,
         maintainAspectRatio: true

@@ -313,6 +313,11 @@ footer {
     display: none;
 }
 
+#test-logs {
+    display: none;
+    width: 70%;
+}
+
 #multiplayer-loading {
     display: flex;
 }
