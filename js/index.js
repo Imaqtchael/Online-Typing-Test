@@ -467,8 +467,13 @@ textarea.addEventListener("keydown", function(event) {
         wordCount.textContent = typedWords;
     }
 
-    textarea.blur();
-    textarea.focus();
+    if (toBeTyped.length - userInput.length <= 40) {
+        textarea.scrollTop = textarea.scrollHeight;
+        textarea.focus();
+    } else {
+        textarea.blur();
+        textarea.focus();
+    }
     input += 1;
 });
 
