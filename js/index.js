@@ -31,6 +31,7 @@ function fetchRandom(words) {
 }
 
 async function generateQuote() {
+    hideWPMAccuracy();
     showLoading();
     wordButton.textContent = " quotes";
     wordButton.insertBefore(icon, wordButton.firstChild);
@@ -66,6 +67,7 @@ async function generateQuote() {
 }
 
 async function generateRandom() {
+    hideWPMAccuracy();
     showLoading();
     wordButton.textContent = " words";
     wordButton.insertBefore(icon, wordButton.firstChild);
@@ -123,8 +125,16 @@ function generateNewTypingTest() {
 
 function startTimer() {
     secondsPassedCounter = setInterval(() => {
-        secondsPassed += .1;
-    }, 100);
+        secondsPassed += 1;
+
+        let wpm = Math.floor((correctInput / 5) * (60 / secondsPassed));
+        currentWPM.push(wpm);
+        currentTimeStamps.push(secondsPassed);
+
+        if (secondsPassed >= 300) {
+            generateNewTypingTest();
+        }
+    }, 1000);
 }
 
 function stopTimer() {
@@ -139,6 +149,8 @@ function resetTypingTest() {
     typingFinished = false;
     startedTyping = false;
     secondsPassed = 0;
+    currentWPM.length = 0;
+    currentTimeStamps.length = 0;
     stopTimer();
     wordCount.textContent = 0;
     textarea.style.caretColor = "var(--tertiary-color)";
@@ -168,11 +180,31 @@ function resetTypingTest() {
 function showWPMAccuracy() {
     accuracyText.parentElement.style.display = "block";
     wpmText.parentElement.style.display = "block";
+    logsChart.style.display = "block";
+    paragraph.style.display = "none";
 }
 
 function hideWPMAccuracy() {
     accuracyText.parentElement.style.display = "none";
     wpmText.parentElement.style.display = "none";
+    logsChart.style.display = "none";
+    paragraph.style.display = "flex";
+}
+
+function updateLogChart() {
+    if (logChart) {
+        logChart.destroy();
+    }
+
+    let parent = document.querySelector("#test-logs");
+    parent.removeChild(parent.firstElementChild);
+    let logElement = document.createElement("canvas");
+    logElement.id = "wpm_accuracy";
+    parent.appendChild(logElement);
+
+    logChart = new Chart("wpm_accuracy", { type: "line", data: logsChartDetails.data, options: logsChartDetails.options });
+
+    console.log(currentTimeStamps);
 }
 
 let showTypingTestButton = document.querySelector("#typing-test");
@@ -225,6 +257,7 @@ restartButton.addEventListener("click", resetTypingTest);
 
 // Typing Text Logic
 
+let logChart;
 let userInput = "";
 let toBeTyped = "";
 let toBeTypedWordCount = 0;
@@ -235,6 +268,8 @@ let accuracyList = [];
 let accuracyListTries = [];
 let wpmList = [];
 let wpmListTries = [];
+let currentWPM = [];
+let currentTimeStamps = [];
 let oneTimeWrongInput = 0;
 let typingFinished = false;
 let startedTyping = false;
@@ -243,7 +278,49 @@ let secondsPassedCounter;
 let wordCount = document.querySelector("#typed-word");
 let accuracyText = document.querySelector("#accuracy-text");
 let wpmText = document.querySelector("#wpm-text");
+let logsChart = document.querySelector("#test-logs");
 let textarea = document.querySelector("textarea");
+let logsChartDetails = {
+    type: "line",
+    data: {
+        labels: currentTimeStamps,
+        datasets: [{
+            fill: false,
+            backgroundColor: "rgba(226, 183, 20, 1.0)",
+            borderColor: "rgba(226, 183, 20, 0.5)",
+            pointRadius: 2,
+            pointHoverRadius: 5,
+            pointBackgroundColor: function(context) {
+                let maximumValueIndex = context.dataset.data.indexOf(Math.max(...context.dataset.data));
+                let minimumValueIndex = context.dataset.data.indexOf(Math.min(...context.dataset.data));
+                let index = context.dataIndex;
+                return maximumValueIndex == index ? "red" : minimumValueIndex == index ? "rgb(100, 102, 105, 1.0)" : "rgb(226, 183, 20, 1.0)";
+            },
+            stepped: true,
+            tension: 0.3,
+            data: currentWPM
+        }]
+    },
+    options: {
+        legend: {
+            display: false
+        },
+        title: {
+            display: false
+        },
+        scales: {
+            xAxes: [{
+                ticks: {
+                    autoSkip: true,
+                    maxTicksLimit: 10
+                }
+            }]
+        },
+        responsive: true,
+        maintainAspectRatio: true
+    }
+};
+
 textarea.addEventListener("mousedown", function(event) {
     event.preventDefault();
 });
@@ -326,8 +403,12 @@ textarea.addEventListener("keydown", function(event) {
         wpmList.push(wpm);
         wpmListTries.push(wpmList.length);
 
+        currentWPM.push(wpm);
+        currentTimeStamps.push((currentTimeStamps.length - 1) + 1)
+
         wpmChart.update();
         accuracyChart.update();
+        updateLogChart();
     } else {
         let typedWords = userInput.split(" ").length - 1;
         wordCount.textContent = typedWords;
