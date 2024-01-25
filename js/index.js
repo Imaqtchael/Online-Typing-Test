@@ -100,21 +100,35 @@ function hideLoading() {
     loading.style.display = "none";
 }
 
+let activeNavButton = document.querySelector("nav button.active");
+
 function showTypingTest() {
+    if (activeNavButton) {
+        activeNavButton.classList.remove("active");
+    }
+
+    activeNavButton = showTypingTestButton;
+    activeNavButton.classList.add("active");
+
     typingTestBody.style.display = "flex";
     historyBody.style.display = "none";
     multiplayerBody.style.display = "none";
 
     if (textarea.offsetParent == null) {
-        console.log("next");
         nextButton.focus();
     } else {
-        console.log("textarea");
         textarea.focus();
     }
 }
 
 function showHistory() {
+    if (activeNavButton) {
+        activeNavButton.classList.remove("active");
+    }
+
+    activeNavButton = showHistoryButton;
+    activeNavButton.classList.add("active");
+
     historyBody.style.display = "flex";
     typingTestBody.style.display = "none";
     multiplayerBody.style.display = "none";

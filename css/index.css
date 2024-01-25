@@ -79,6 +79,10 @@ nav button:hover>i {
     color: var(--header-color);
 }
 
+nav button.active>i {
+    color: var(--header-color);
+}
+
 .body {
     flex: 1 1 auto;
     display: flex;
