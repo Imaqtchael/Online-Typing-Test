@@ -159,8 +159,15 @@ function startTimer() {
     }, 1000);
 }
 
+function startPreciseTimer() {
+    microSecondsPassedCounter = setInterval(() => {
+        microSecondsPassed += .1;
+    }, 100)
+}
+
 function stopTimer() {
     clearInterval(secondsPassedCounter);
+    clearInterval(microSecondsPassedCounter);
 }
 
 function resetTypingTest() {
@@ -172,6 +179,9 @@ function resetTypingTest() {
     typingFinished = false;
     startedTyping = false;
     secondsPassed = 0;
+    microSecondsPassed = 0;
+    mistakesAnnotations = {};
+    mistakesTime.length = 0;
     currentWPM.length = 0;
     currentRawWPM.length = 0;
     currentTimeStamps.length = 0;
@@ -226,6 +236,21 @@ function updateLogChart() {
     let logElement = document.createElement("canvas");
     logElement.id = "wpm_accuracy";
     parent.appendChild(logElement);
+
+    mistakesAnnotations = mistakesTime.map(log => {
+        console.log(log);
+        return {
+            type: 'point',
+            backgroundColor: 'transparent',
+            borderColor: 'red',
+            borderWidth: 2,
+            pointStyle: 'crossRot',
+            radius: 5,
+            scaleID: 'error',
+            xValue: log.x,
+            yValue: log.y
+        }
+    });
 
     logChart = new Chart("wpm_accuracy", { type: "line", data: logsChartDetails.data, options: logsChartDetails.options });
 
@@ -296,11 +321,15 @@ let wpmListTries = [];
 let currentWPM = [];
 let currentRawWPM = [];
 let currentTimeStamps = [];
+let mistakesTime = [];
+let mistakesAnnotations;
 let oneTimeWrongInput = 0;
 let typingFinished = false;
 let startedTyping = false;
 let secondsPassed = 0;
+let microSecondsPassed = 0;
 let secondsPassedCounter;
+let microSecondsPassedCounter;
 let wordCount = document.querySelector("#typed-word");
 let accuracyText = document.querySelector("#accuracy-text");
 let wpmText = document.querySelector("#wpm-text");
@@ -342,6 +371,10 @@ let logsChartDetails = {
             stepped: true,
             tension: 0.3,
             data: currentRawWPM
+        }, {
+            label: 'errors',
+            borderColor: 'red',
+            yAxisID: 'error'
         }]
     },
     options: {
@@ -349,7 +382,7 @@ let logsChartDetails = {
             display: false
         },
         title: {
-            display: false
+            display: true
         },
         scales: {
             xAxes: [{
@@ -361,7 +394,15 @@ let logsChartDetails = {
             yAxes: [{
                 ticks: {
                     autoSkip: true,
-                    maxTicksLimit: 5
+                    maxTicksLimit: 4
+                }
+            }, {
+                stacked: false,
+                position: 'right',
+                id: 'error',
+                ticks: {
+                    autoSkip: true,
+                    maxTicksLimit: 4
                 }
             }]
         },
@@ -374,7 +415,14 @@ let logsChartDetails = {
             intersect: false
         },
         responsive: true,
-        maintainAspectRatio: true
+        maintainAspectRatio: false,
+        plugins: {
+            annotation: {
+                annotations: {
+                    ...mistakesAnnotations
+                }
+            }
+        }
     }
 };
 
@@ -399,6 +447,7 @@ textarea.addEventListener("keydown", function(event) {
     if (!startedTyping) {
         startedTyping = true;
         startTimer();
+        startPreciseTimer();
     }
 
     if (event.key == "Backspace") {
@@ -409,8 +458,11 @@ textarea.addEventListener("keydown", function(event) {
 
         if (wrongInput > 0) {
             wrongInput -= 1;
+
+            if (wrongInput == 0) {
+                textarea.style.caretColor = "var(--tertiary-color)";
+            }
         } else {
-            textarea.style.caretColor = "var(--tertiary-color)";
             correctInput -= 1;
         }
     } else {
@@ -420,6 +472,7 @@ textarea.addEventListener("keydown", function(event) {
             textarea.style.caretColor = "var(--tertiary-color)";
         } else {
             wrongInput += 1;
+            mistakesTime.push({ y: 1, x: microSecondsPassed });
             totalWrongInput += 1;
             textarea.style.caretColor = "red";
         }
@@ -443,6 +496,8 @@ textarea.addEventListener("keydown", function(event) {
     })
 
     if (userInput == toBeTyped) {
+        console.log(mistakesTime);
+        console.log(mistakesAnnotations);
         typingFinished = true;
         startedTyping = false;
         stopTimer();

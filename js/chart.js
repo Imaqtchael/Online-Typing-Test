@@ -31,8 +31,8 @@ let accuracyChart = new Chart("accuracy", {
         scales: {
             yAxes: [{
                 ticks: {
-                    max: 110,
-                    min: 0
+                    autoSkip: true,
+                    maxTicksLimit: 4
                 }
             }],
             xAxes: [{
@@ -51,7 +51,7 @@ let accuracyChart = new Chart("accuracy", {
             intersect: false
         },
         responsive: true,
-        maintainAspectRatio: true
+        maintainAspectRatio: false
 
     }
 });
@@ -91,6 +91,12 @@ let wpmChart = new Chart("wpm", {
                     autoSkip: true,
                     maxTicksLimit: 10
                 }
+            }],
+            yAxes: [{
+                ticks: {
+                    autoSkip: true,
+                    maxTicksLimit: 4
+                }
             }]
         },
         tooltips: {
@@ -102,7 +108,7 @@ let wpmChart = new Chart("wpm", {
             intersect: false
         },
         responsive: true,
-        maintainAspectRatio: true
+        maintainAspectRatio: false
     }
 });
 

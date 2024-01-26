@@ -20,9 +20,9 @@
         <nav>
             <p><span>key</span>bored</p>
             <div class="nav-buttons">
-                <button id="typing-test" title="Show typing test" class="active"><i class="fa-solid fa-keyboard"></i></button>
-                <button id="history" title="Show typing history"><i class="fa-solid fa-clock"></i></button>
-                <button id="multiplayer" title="Play with other player"><i class="fa-solid fa-users"></i></button>
+                <button id="typing-test" data-title="Show typing test" class="active"><i class="fa-solid fa-keyboard"></i></button>
+                <button id="history" data-title="Show typing history"><i class="fa-solid fa-clock"></i></button>
+                <button id="multiplayer" data-title="Play with other typist"><i class="fa-solid fa-users"></i></button>
             </div>
         </nav>
         <div id="body" class="body">
@@ -102,27 +102,31 @@
             </div>
         </div>
         <div id="history-body">
-            <canvas id="accuracy"></canvas>
-            <canvas id="wpm"></canvas>
+            <div class="accuracy-logs">
+                <canvas id="accuracy"></canvas>
+            </div>
+            <div class="wpm-logs">
+                <canvas id="wpm"></canvas>
+            </div>
         </div>
         <div class="contacts">
-            <a href="https://www.facebook.com/Imaqtchael" target="_blank">
+            <a href="https://www.facebook.com/Imaqtchael" class="link" data-title="Let's get in touch" target="_blank">
                 <div class="links">
                     <i class="fa-brands fa-facebook-f"></i>
                     <p>Facebook</p>
                 </div>
             </a>
-            <a href="http://www.linkedin.com" target="_blank">
+            <a href="http://www.linkedin.com" class="link" data-title="Let's get in touch" target="_blank">
                 <div class="links"><i class="fa-brands fa-linkedin-in"></i>
                     <p>LinkedIn</p>
                 </div>
             </a>
-            <a href="http://www.github.com/MJBarcenas" target="_blank">
+            <a href="http://www.github.com/MJBarcenas" class="link" data-title="Let's get in touch" target="_blank">
                 <div class="links"><i class="fa-brands fa-github"></i>
                     <p>Github</p>
                 </div>
             </a>
-            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=mjbarcenas.official@gmail.com" target="_blank">
+            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=mjbarcenas.official@gmail.com" class="link" data-title="Let's get in touch" target="_blank">
                 <div class="links"><i class="fa-solid fa-envelope"></i>
                     <p>Gmail</p>
                 </div>
