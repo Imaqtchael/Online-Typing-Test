@@ -320,6 +320,7 @@ footer {
 #test-logs {
     display: none;
     width: 70%;
+    height: 200px;
 }
 
 #multiplayer-loading {

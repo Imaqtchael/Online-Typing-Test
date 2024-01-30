@@ -374,7 +374,7 @@ let logsChartDetails = {
             intersect: false
         },
         responsive: true,
-        maintainAspectRatio: true
+        maintainAspectRatio: false
     }
 };
 
