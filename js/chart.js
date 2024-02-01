@@ -15,7 +15,6 @@ let accuracyChart = new Chart("accuracy", {
                 let index = context.dataIndex;
                 return maximumValueIndex == index ? "red" : minimumValueIndex == index ? "rgb(100, 102, 105, 1.0)" : "rgb(209, 208, 197, 1.0)";
             },
-            stepped: false,
             tension: 0.3,
             data: accuracyList
         }]
@@ -29,18 +28,18 @@ let accuracyChart = new Chart("accuracy", {
             text: "accuracy history"
         },
         scales: {
-            yAxes: [{
+            y: {
                 ticks: {
                     autoSkip: true,
                     maxTicksLimit: 4
                 }
-            }],
-            xAxes: [{
+            },
+            x: {
                 ticks: {
                     autoSkip: true,
                     maxTicksLimit: 10
                 }
-            }]
+            }
         },
         tooltips: {
             mode: 'index',
@@ -72,7 +71,6 @@ let wpmChart = new Chart("wpm", {
                 let index = context.dataIndex;
                 return maximumValueIndex == index ? "red" : minimumValueIndex == index ? "rgb(100, 102, 105, 1.0)" : "rgb(226, 183, 20, 1.0)";
             },
-            stepped: true,
             tension: 0.3,
             data: wpmList
         }]
@@ -86,18 +84,18 @@ let wpmChart = new Chart("wpm", {
             text: "words per minute history"
         },
         scales: {
-            xAxes: [{
+            x: {
                 ticks: {
                     autoSkip: true,
                     maxTicksLimit: 10
                 }
-            }],
-            yAxes: [{
+            },
+            y: {
                 ticks: {
                     autoSkip: true,
                     maxTicksLimit: 4
                 }
-            }]
+            }
         },
         tooltips: {
             mode: 'index',
@@ -108,7 +106,53 @@ let wpmChart = new Chart("wpm", {
             intersect: false
         },
         responsive: true,
-        maintainAspectRatio: false
+        maintainAspectRatio: false,
+        plugins: {
+            annotation: {
+                annotations: {
+                    "error0": {
+                        "type": "point",
+                        "backgroundColor": "transparent",
+                        "borderColor": "red",
+                        "borderWidth": 2,
+                        "pointStyle": "crossRot",
+                        "radius": 5,
+                        "xValue": 0,
+                        "yValue": 1
+                    },
+                    "error1": {
+                        "type": "point",
+                        "backgroundColor": "transparent",
+                        "borderColor": "red",
+                        "borderWidth": 2,
+                        "pointStyle": "crossRot",
+                        "radius": 5,
+                        "xValue": 0,
+                        "yValue": 1
+                    },
+                    "error2": {
+                        "type": "point",
+                        "backgroundColor": "transparent",
+                        "borderColor": "red",
+                        "borderWidth": 2,
+                        "pointStyle": "crossRot",
+                        "radius": 5,
+                        "xValue": 0,
+                        "yValue": 1
+                    },
+                    "error3": {
+                        "type": "point",
+                        "backgroundColor": "transparent",
+                        "borderColor": "red",
+                        "borderWidth": 2,
+                        "pointStyle": "crossRot",
+                        "radius": 5,
+                        "xValue": 0,
+                        "yValue": 1
+                    }
+                }
+            }
+        }
     }
 });
 

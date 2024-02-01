@@ -237,23 +237,28 @@ function updateLogChart() {
     logElement.id = "wpm_accuracy";
     parent.appendChild(logElement);
 
-    mistakesAnnotations = mistakesTime.map(log => {
-        console.log(log);
-        return {
-            type: 'point',
-            backgroundColor: 'transparent',
-            borderColor: 'red',
-            borderWidth: 2,
-            pointStyle: 'crossRot',
-            radius: 5,
-            scaleID: 'error',
+    let _annotations = mistakesTime.map((log, index) => ({
+        ["error" + index]: {
+            type: "point",
+            yScaleID: "error",
+            backgroundColor: "transparent",
+            borderColor: "red",
+            borderWidth: 1,
+            pointStyle: "crossRot",
+            radius: 3,
             xValue: log.x,
             yValue: log.y
         }
+    }));
+
+    _annotations.forEach(element => {
+        let key = Object.keys(element)[0];
+        mistakesAnnotations[key] = element[key];
     });
 
     logChart = new Chart("wpm_accuracy", { type: "line", data: logsChartDetails.data, options: logsChartDetails.options });
-
+    logChart.options.plugins.annotation.annotations = mistakesAnnotations;
+    logChart.update();
 }
 
 let showTypingTestButton = document.querySelector("#typing-test");
@@ -322,7 +327,7 @@ let currentWPM = [];
 let currentRawWPM = [];
 let currentTimeStamps = [];
 let mistakesTime = [];
-let mistakesAnnotations;
+let mistakesAnnotations = {};
 let oneTimeWrongInput = 0;
 let typingFinished = false;
 let startedTyping = false;
@@ -341,9 +346,9 @@ let logsChartDetails = {
         labels: currentTimeStamps,
         datasets: [{
             label: "wpm",
-            fill: false,
-            backgroundColor: "rgba(226, 183, 20, 1.0)",
-            borderColor: "rgba(226, 183, 20, 0.5)",
+            fill: true,
+            backgroundColor: "rgba(0, 0, 0, 0.1)",
+            borderColor: "rgba(226, 183, 20, 0.7)",
             pointRadius: 2,
             pointHoverRadius: 5,
             pointBackgroundColor: function(context) {
@@ -352,14 +357,13 @@ let logsChartDetails = {
                 let index = context.dataIndex;
                 return maximumValueIndex == index ? "red" : minimumValueIndex == index ? "rgb(100, 102, 105, 1.0)" : "rgb(226, 183, 20, 1.0)";
             },
-            stepped: true,
             tension: 0.3,
             data: currentWPM
         }, {
             label: "raw",
-            fill: false,
-            backgroundColor: "rgba(209, 208, 197, 1.0)",
-            borderColor: "rgba(209, 208, 197, 0.5)",
+            fill: true,
+            backgroundColor: "rgba(0, 0, 0, 0.1)",
+            borderColor: "rgba(209, 208, 197, 0.7)",
             pointRadius: 2,
             pointHoverRadius: 5,
             pointBackgroundColor: function(context) {
@@ -368,13 +372,12 @@ let logsChartDetails = {
                 let index = context.dataIndex;
                 return maximumValueIndex == index ? "red" : minimumValueIndex == index ? "rgb(100, 102, 105, 1.0)" : "rgb(209, 208, 197, 1.0)";
             },
-            stepped: true,
             tension: 0.3,
             data: currentRawWPM
         }, {
             label: 'errors',
             borderColor: 'red',
-            yAxisID: 'error'
+            yAxisID: 'error',
         }]
     },
     options: {
@@ -385,28 +388,32 @@ let logsChartDetails = {
             display: true
         },
         scales: {
-            xAxes: [{
+            x: {
                 ticks: {
                     autoSkip: true,
                     maxTicksLimit: 10
                 }
-            }],
-            yAxes: [{
+            },
+            y: {
                 ticks: {
                     autoSkip: true,
                     maxTicksLimit: 4
                 }
-            }, {
-                stacked: false,
-                position: 'right',
-                id: 'error',
+            },
+            error: {
+                type: "linear",
+                display: true,
+                position: "right",
+                grid: {
+                    drawOnChartArea: false
+                },
                 ticks: {
                     autoSkip: true,
                     maxTicksLimit: 4
                 }
-            }]
+            }
         },
-        tooltips: {
+        interaction: {
             mode: 'index',
             intersect: false
         },
@@ -418,9 +425,8 @@ let logsChartDetails = {
         maintainAspectRatio: false,
         plugins: {
             annotation: {
-                annotations: {
-                    ...mistakesAnnotations
-                }
+                clip: false,
+                annotations: mistakesAnnotations
             }
         }
     }
@@ -496,8 +502,6 @@ textarea.addEventListener("keydown", function(event) {
     })
 
     if (userInput == toBeTyped) {
-        console.log(mistakesTime);
-        console.log(mistakesAnnotations);
         typingFinished = true;
         startedTyping = false;
         stopTimer();
@@ -523,6 +527,8 @@ textarea.addEventListener("keydown", function(event) {
         wpmChart.update();
         accuracyChart.update();
         updateLogChart();
+        console.log(JSON.stringify(mistakesAnnotations));
+        // console.log(logChart.options.plugins.annotation.annotations);
     } else {
         let typedWords = userInput.split(" ").length - 1;
         wordCount.textContent = typedWords;
@@ -542,3 +548,31 @@ let urlParams = new URLSearchParams(window.location.search);
 if (!urlParams.has("code")) {
     generateQuote();
 }
+
+const config = {
+    type: 'line',
+    data: {
+        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+        datasets: [{
+            label: 'My First Dataset',
+            data: [65, 59, 80, 81, 56, 55, 40],
+            fill: false,
+            borderColor: 'rgb(75, 192, 192)',
+            tension: 0.1
+        }]
+    },
+    options: {
+        plugins: {
+            annotation: {
+                annotations: {
+                    point1: {
+                        type: 'point',
+                        xValue: 1,
+                        yValue: 60,
+                        backgroundColor: 'rgba(255, 99, 132, 0.25)'
+                    }
+                }
+            }
+        }
+    }
+};
