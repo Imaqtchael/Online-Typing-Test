@@ -455,7 +455,7 @@ textarea.addEventListener("keydown", function(event) {
         return;
     }
 
-    if ((userInput.length == toBeTyped.length && !typingFinished && event.key != "Backspace") || typingFinished || ["Shift", "Enter", "Escape", "CapsLock", "Control", "Alt", "Meta", "ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp"].includes(event.key)) {
+    if ((userInput.length == toBeTyped.length && !typingFinished && event.key != "Backspace") || typingFinished || (!/^[a-zA-Z0-9\!\@\#\$\%\^\&\*\(\)\_\-\+\=\{\[\}\]\|\\\:\;\"\'\<\,\>\.\?\/ ]$/.test(event.key) || (event.shiftKey && !/^[A-Z\!\@\#\$\%\^\&\*\(\)\_\-\+\=\{\[\}\]\|\\\:\;\"\'\<\,\>\.\?\/ ]*$/.test(event.key))) && event.key != "Backspace") {
         return;
     }
 
