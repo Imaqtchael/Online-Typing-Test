@@ -218,6 +218,18 @@ function showWPMAccuracy() {
     paragraph.style.display = "none";
 }
 
+function showLogsTest() {
+    currentRawWPM = [70, 86, 90];
+    currentWPM = [60, 76, 80];
+    currentTimeStamps = [1, 2, 3];
+
+    accuracyText.textContent = 90;
+    wpmText.textContent = 100;
+
+    updateLogChart();
+    showWPMAccuracy();
+}
+
 function hideWPMAccuracy() {
     accuracyText.parentElement.style.display = "none";
     wpmText.parentElement.style.display = "none";
@@ -242,8 +254,8 @@ function updateLogChart() {
             type: "point",
             yScaleID: "error",
             backgroundColor: "transparent",
-            borderColor: "red",
-            borderWidth: 1,
+            borderColor: "#ff7d7d",
+            borderWidth: 1.5,
             pointStyle: "crossRot",
             radius: 3,
             xValue: log.x,
@@ -375,32 +387,45 @@ let logsChartDetails = {
             tension: 0.3,
             data: currentRawWPM
         }, {
-            label: 'errors',
+            label: "error",
             borderColor: 'red',
             yAxisID: 'error',
         }]
     },
     options: {
-        legend: {
-            display: false
-        },
-        title: {
-            display: true
-        },
         scales: {
             x: {
                 ticks: {
                     autoSkip: true,
                     maxTicksLimit: 10
-                }
+                },
+                suggestedMin: 0
             },
             y: {
+                title: {
+                    display: true,
+                    text: "words per minute",
+                    font: {
+                        size: 14,
+                        lineHeight: 1.2,
+                        style: 'normal'
+                    }
+                },
                 ticks: {
                     autoSkip: true,
                     maxTicksLimit: 4
                 }
             },
             error: {
+                title: {
+                    display: true,
+                    text: "errors",
+                    font: {
+                        size: 14,
+                        lineHeight: 1.2,
+                        style: 'normal'
+                    }
+                },
                 type: "linear",
                 display: true,
                 position: "right",
@@ -424,6 +449,9 @@ let logsChartDetails = {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
+            legend: {
+                display: false
+            },
             annotation: {
                 clip: false,
                 annotations: mistakesAnnotations
@@ -454,6 +482,12 @@ textarea.addEventListener("keydown", function(event) {
         startedTyping = true;
         startTimer();
         startPreciseTimer();
+
+        let wpm = Math.floor((correctInput / 5) * (60 / 1));
+        let raw = Math.floor((input / 5) * (60 / 1));
+        currentWPM.push(wpm);
+        currentRawWPM.push(raw);
+        currentTimeStamps.push(0);
     }
 
     if (event.key == "Backspace") {
@@ -519,16 +553,14 @@ textarea.addEventListener("keydown", function(event) {
         accuracyListTries.push(accuracyList.length);
         wpmList.push(wpm);
         wpmListTries.push(wpmList.length);
-        currentRawWPM.push(raw);
 
+        currentRawWPM.push(raw);
         currentWPM.push(wpm);
         currentTimeStamps.push((currentTimeStamps.length - 1) + 1)
 
         wpmChart.update();
         accuracyChart.update();
         updateLogChart();
-        console.log(JSON.stringify(mistakesAnnotations));
-        // console.log(logChart.options.plugins.annotation.annotations);
     } else {
         let typedWords = userInput.split(" ").length - 1;
         wordCount.textContent = typedWords;
@@ -547,32 +579,5 @@ textarea.addEventListener("keydown", function(event) {
 let urlParams = new URLSearchParams(window.location.search);
 if (!urlParams.has("code")) {
     generateQuote();
+    // showLogsTest();
 }
-
-const config = {
-    type: 'line',
-    data: {
-        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-        datasets: [{
-            label: 'My First Dataset',
-            data: [65, 59, 80, 81, 56, 55, 40],
-            fill: false,
-            borderColor: 'rgb(75, 192, 192)',
-            tension: 0.1
-        }]
-    },
-    options: {
-        plugins: {
-            annotation: {
-                annotations: {
-                    point1: {
-                        type: 'point',
-                        xValue: 1,
-                        yValue: 60,
-                        backgroundColor: 'rgba(255, 99, 132, 0.25)'
-                    }
-                }
-            }
-        }
-    }
-};
