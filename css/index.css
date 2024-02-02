@@ -4,6 +4,10 @@
     --tertiary-color: #e2b714;
     --text-color: #646669;
     --header-color: #d1d0c5;
+    --small-text: 1rem;
+    --medium-text: 1.3rem;
+    --large-text: 1.8rem;
+    --xlarge-text: 4rem;
     --text-size: 1.5rem;
     --header-size: 3rem;
 }
@@ -16,10 +20,6 @@
     font-family: monospace;
     background-color: var(--primary-color);
     color: var(--text-color);
-}
-
-html {
-    overflow: hidden;
 }
 
 .textbox-control {
@@ -43,7 +43,7 @@ html {
     flex-direction: column;
     justify-content: center;
     height: 100%;
-    max-width: 100rem;
+    max-width: 1250px;
     padding: 1rem;
     margin: 0 auto;
 }
@@ -76,7 +76,7 @@ nav button {
     outline: none;
     border: none;
     color: var(--text-color);
-    font-size: 1.2rem;
+    font-size: var(--medium-text)
 }
 
 nav button:hover>i {
@@ -98,11 +98,11 @@ nav button.active>i {
     content: attr(data-title);
     background-color: #000;
     color: var(--header-color);
-    font-size: 1rem;
+    font-size: var(--small-text);
     position: absolute;
     padding: .5rem;
     bottom: -2em;
-    left: 100%;
+    right: 100%;
     white-space: nowrap;
     box-shadow: 1px 1px 3px #222222;
     opacity: 0;
@@ -113,10 +113,6 @@ nav button.active>i {
 
 [data-title] {
     position: relative;
-}
-
-[data-title].link:after {
-    left: 50%
 }
 
 .body {
@@ -131,8 +127,8 @@ nav button.active>i {
     margin-top: auto;
     background-color: var(--secondary-color);
     height: 5rem;
-    display: flex;
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: repeat(3, auto);
     align-items: center;
     gap: 2rem;
     padding: 0 5rem;
@@ -141,7 +137,7 @@ nav button.active>i {
 
 .body .game-settings label {
     background-color: var(--secondary-color);
-    font-size: 1.2rem;
+    font-size: var(--medium-text);
     cursor: pointer;
 }
 
@@ -165,7 +161,6 @@ nav button.active>i {
 }
 
 .body .game-settings i {
-    margin-right: .3rem;
     background-color: var(--secondary-color);
 }
 
@@ -214,7 +209,7 @@ nav button.active>i {
 }
 
 .body .word-count p {
-    font-size: 1.8rem;
+    font-size: var(--large-text);
     color: var(--tertiary-color);
     user-select: none;
     padding: .5rem;
@@ -234,7 +229,7 @@ nav button.active>i {
     border: none;
     width: 100%;
     outline: none;
-    font-size: 1.8rem;
+    font-size: var(--large-text);
     caret-color: var(--tertiary-color);
     overflow: hidden;
     z-index: 0;
@@ -276,7 +271,7 @@ nav button.active>i {
 
 .paragraph-buttons>button>i {
     cursor: pointer;
-    font-size: 1.2rem;
+    font-size: var(--medium-text);
 }
 
 .legends {
@@ -346,7 +341,7 @@ nav button.active>i {
 }
 
 .links p {
-    font-size: 1.1rem;
+    font-size: var(--small-text);
 }
 
 footer {
@@ -419,7 +414,7 @@ footer {
 
 .code-body>button {
     width: 100%;
-    font-size: 1.2rem;
+    font-size: var(--medium-text);
     padding: 0.5rem;
     outline: none;
     border: none;
@@ -482,22 +477,23 @@ footer {
     display: none;
     grid-template-columns: auto 1fr;
     gap: 1rem;
-    width: 80%;
+    width: 90%;
 }
 
-.wpm_accuracy_text>* {
+.wpm_accuracy_text * {
     display: block;
-    font-size: 4rem;
-    line-height: 4rem;
+    font-size: var(--xlarge-text);
+    line-height: var(--xlarge-text);
 }
 
 .wpm_accuracy_text span[id],
-.wpm_accuracy_text>p {
+.wpm_accuracy_text p {
+    display: inline-block;
     color: var(--tertiary-color);
 }
 
 .wpm_accuracy_text>span:nth-child(odd) {
-    font-size: 3rem;
+    font-size: var(--header-size);
 }
 
 #test-chart {
@@ -507,4 +503,57 @@ footer {
 
 #test-chart canvas {
     width: 100% !important;
+}
+
+@media only screen and (max-width: 560px) {
+     :root {
+        --text-size: 1.3rem;
+        --header-size: 2.5rem;
+        --medium-text: 1.2rem;
+        --large-text: 1.5rem;
+        --xlarge-text: 3.5rem;
+    }
+    .body .game-settings {
+        grid-template-columns: repeat(2, auto);
+        grid-template-rows: repeat(2, auto);
+        grid-column-gap: 2rem;
+        grid-row-gap: .5rem;
+        padding: 1rem 2rem;
+        height: 6rem;
+    }
+    .body .game-settings #mode-input,
+    .body .game-settings #word-input {
+        grid-column: 1/3;
+    }
+    .body .game-settings input#mode:checked~#mode-input,
+    .body .game-settings input#word:checked~#word-input {
+        justify-content: space-between;
+        padding: 0;
+        border: none;
+    }
+    .paragraph mark {
+        font-size: var(--large-text);
+    }
+    .test-logs {
+        grid-template-columns: none;
+        grid-template-rows: auto 1fr;
+    }
+    .wpm_accuracy_text {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .contacts {
+        margin: 1rem 0;
+        display: flex;
+        justify-content: space-between;
+    }
+    nav .nav-buttons {
+        align-items: center;
+    }
+}
+
+@media only screen and (max-height: 460px) {
+    .whole {
+        height: 80vw;
+    }
 }
