@@ -68,7 +68,7 @@ nav .nav-buttons {
     display: flex;
     flex: 1 1 auto;
     gap: 3rem;
-    align-items: end;
+    align-items: center;
     justify-content: end;
 }
 
@@ -546,9 +546,6 @@ footer {
         margin: 1rem 0;
         display: flex;
         justify-content: space-between;
-    }
-    nav .nav-buttons {
-        align-items: center;
     }
 }
 
