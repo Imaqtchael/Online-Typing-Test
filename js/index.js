@@ -159,15 +159,8 @@ function startTimer() {
     }, 1000);
 }
 
-function startPreciseTimer() {
-    microSecondsPassedCounter = setInterval(() => {
-        microSecondsPassed += .1;
-    }, 100)
-}
-
 function stopTimer() {
     clearInterval(secondsPassedCounter);
-    clearInterval(microSecondsPassedCounter);
 }
 
 function resetTypingTest() {
@@ -179,12 +172,10 @@ function resetTypingTest() {
     typingFinished = false;
     startedTyping = false;
     secondsPassed = 0;
-    microSecondsPassed = 0;
-    mistakesAnnotations = {};
-    mistakesTime.length = 0;
     currentWPM.length = 0;
     currentRawWPM.length = 0;
     currentTimeStamps.length = 0;
+    currentMistakes.length = 0;
     stopTimer();
     wordCount.textContent = 0;
     textarea.style.caretColor = "var(--tertiary-color)";
@@ -214,13 +205,14 @@ function resetTypingTest() {
 function showWPMAccuracy() {
     accuracyText.parentElement.style.display = "block";
     wpmText.parentElement.style.display = "block";
-    logsChart.style.display = "block";
+    logsChart.style.display = "grid";
     paragraph.style.display = "none";
 }
 
 function showLogsTest() {
     currentRawWPM = [70, 86, 90];
     currentWPM = [60, 76, 80];
+    currentMistakes = [{ x: 2, y: 3 }]
     currentTimeStamps = [1, 2, 3];
 
     accuracyText.textContent = 90;
@@ -242,35 +234,14 @@ function updateLogChart() {
         logChart.destroy();
     }
 
-    let parent = document.querySelector("#test-logs");
-    parent.removeChild(parent.firstElementChild);
+    let parent = document.querySelector("#test-chart");
+    parent.removeChild(parent.lastElementChild);
 
     let logElement = document.createElement("canvas");
     logElement.id = "wpm_accuracy";
     parent.appendChild(logElement);
 
-    let _annotations = mistakesTime.map((log, index) => ({
-        ["error" + index]: {
-            type: "point",
-            yScaleID: "error",
-            backgroundColor: "transparent",
-            borderColor: "#ff7d7d",
-            borderWidth: 1.5,
-            pointStyle: "crossRot",
-            radius: 3,
-            xValue: log.x,
-            yValue: log.y
-        }
-    }));
-
-    _annotations.forEach(element => {
-        let key = Object.keys(element)[0];
-        mistakesAnnotations[key] = element[key];
-    });
-
     logChart = new Chart("wpm_accuracy", { type: "line", data: logsChartDetails.data, options: logsChartDetails.options });
-    logChart.options.plugins.annotation.annotations = mistakesAnnotations;
-    logChart.update();
 }
 
 let showTypingTestButton = document.querySelector("#typing-test");
@@ -338,19 +309,20 @@ let wpmListTries = [];
 let currentWPM = [];
 let currentRawWPM = [];
 let currentTimeStamps = [];
-let mistakesTime = [];
-let mistakesAnnotations = {};
+let currentMistakes = [];
+// let currentRawWPM = [70, 86, 90];
+// let currentWPM = [60, 76, 80];
+// let currentMistakes = [{ x: 2, y: 3 }]
+// let currentTimeStamps = [1, 2, 3];
 let oneTimeWrongInput = 0;
 let typingFinished = false;
 let startedTyping = false;
 let secondsPassed = 0;
-let microSecondsPassed = 0;
 let secondsPassedCounter;
-let microSecondsPassedCounter;
 let wordCount = document.querySelector("#typed-word");
 let accuracyText = document.querySelector("#accuracy-text");
 let wpmText = document.querySelector("#wpm-text");
-let logsChart = document.querySelector("#test-logs");
+let logsChart = document.querySelector(".test-logs");
 let textarea = document.querySelector("textarea");
 let logsChartDetails = {
     type: "line",
@@ -362,7 +334,7 @@ let logsChartDetails = {
             backgroundColor: "rgba(0, 0, 0, 0.1)",
             borderColor: "rgba(226, 183, 20, 0.7)",
             pointRadius: 2,
-            pointHoverRadius: 5,
+            pointHoverRadius: 2,
             pointBackgroundColor: function(context) {
                 let maximumValueIndex = context.dataset.data.indexOf(Math.max(...context.dataset.data));
                 let minimumValueIndex = context.dataset.data.indexOf(Math.min(...context.dataset.data));
@@ -377,7 +349,7 @@ let logsChartDetails = {
             backgroundColor: "rgba(0, 0, 0, 0.1)",
             borderColor: "rgba(209, 208, 197, 0.7)",
             pointRadius: 2,
-            pointHoverRadius: 5,
+            pointHoverRadius: 2,
             pointBackgroundColor: function(context) {
                 let maximumValueIndex = context.dataset.data.indexOf(Math.max(...context.dataset.data));
                 let minimumValueIndex = context.dataset.data.indexOf(Math.min(...context.dataset.data));
@@ -387,9 +359,19 @@ let logsChartDetails = {
             tension: 0.3,
             data: currentRawWPM
         }, {
-            label: "error",
-            borderColor: 'red',
+            type: "scatter",
+            label: "errors",
+            borderColor: function(context) {
+                let index = context.dataIndex;
+                let value = context.dataset.data[index];
+                return value == 0 ? "transparent" : '#ff7d7d';
+            },
+            borderWidth: 1.5,
+            pointStyle: "crossRot",
+            pointRadius: 3,
+            pointHoverRadius: 5,
             yAxisID: 'error',
+            data: currentMistakes
         }]
     },
     options: {
@@ -435,15 +417,18 @@ let logsChartDetails = {
                 ticks: {
                     autoSkip: true,
                     maxTicksLimit: 4
-                }
+                },
+                min: 0
             }
         },
         interaction: {
-            mode: 'index',
+            mode: 'nearest',
+            axis: 'x',
             intersect: false
         },
         hover: {
-            mode: 'index',
+            mode: 'nearest',
+            axis: 'x',
             intersect: false
         },
         responsive: true,
@@ -451,10 +436,6 @@ let logsChartDetails = {
         plugins: {
             legend: {
                 display: false
-            },
-            annotation: {
-                clip: false,
-                annotations: mistakesAnnotations
             }
         }
     }
@@ -481,7 +462,6 @@ textarea.addEventListener("keydown", function(event) {
     if (!startedTyping) {
         startedTyping = true;
         startTimer();
-        startPreciseTimer();
 
         let wpm = Math.floor((correctInput / 5) * (60 / 1));
         let raw = Math.floor((input / 5) * (60 / 1));
@@ -512,9 +492,15 @@ textarea.addEventListener("keydown", function(event) {
             textarea.style.caretColor = "var(--tertiary-color)";
         } else {
             wrongInput += 1;
-            mistakesTime.push({ y: 1, x: microSecondsPassed });
             totalWrongInput += 1;
             textarea.style.caretColor = "red";
+
+            let index = Object.keys(currentMistakes).findIndex(key => currentMistakes[key].x == secondsPassed);
+            if (index != -1) {
+                currentMistakes[index].y = wrongInput;
+            } else {
+                currentMistakes.push({ x: secondsPassed, y: wrongInput })
+            }
         }
     }
 
@@ -556,7 +542,7 @@ textarea.addEventListener("keydown", function(event) {
 
         currentRawWPM.push(raw);
         currentWPM.push(wpm);
-        currentTimeStamps.push((currentTimeStamps.length - 1) + 1)
+        currentTimeStamps.push((currentTimeStamps.length - 1) + 1);
 
         wpmChart.update();
         accuracyChart.update();

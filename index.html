@@ -50,11 +50,17 @@
             </div>
             <div class="word-count">
                 <p><span id="typed-word"></span>/<span id="word-total"></span></p>
-                <p>accuracy: <span id="accuracy-text"></span>%</p>
-                <p>wpm: <span id="wpm-text"></span></p>
             </div>
-            <div id="test-logs">
-                <canvas id="wpm_accuracy"></canvas>
+            <div class="test-logs">
+                <div class="wpm_accuracy_text">
+                    <span>wpm</span>
+                    <span id="wpm-text"></span>
+                    <span>acc</span>
+                    <p><span id="accuracy-text"></span>%</p>
+                </div>
+                <div id="test-chart">
+                    <canvas id="wpm_accuracy"></canvas>
+                </div>
             </div>
             <div id="loading">
                 <span class="loader"></span>
