@@ -4,6 +4,7 @@
     --tertiary-color: #e2b714;
     --text-color: #646669;
     --header-color: #d1d0c5;
+    --wrong-color: #ca4754;
     --small-text: 1rem;
     --medium-text: 1.3rem;
     --large-text: 1.8rem;
@@ -81,6 +82,13 @@ nav button {
 
 nav button:hover>i {
     cursor: pointer;
+}
+
+nav button:first-child>i {
+    color: var(--tertiary-color);
+}
+
+nav button:not(:first-child):hover>i {
     color: var(--header-color);
 }
 
@@ -96,8 +104,8 @@ nav button.active>i {
 
 [data-title]:after {
     content: attr(data-title);
-    background-color: #000;
-    color: var(--header-color);
+    background-color: var(--secondary-color);
+    color: var(--tertiary-color);
     font-size: var(--small-text);
     position: absolute;
     padding: .5rem;
@@ -278,7 +286,7 @@ nav button.active>i {
     margin-top: auto;
     display: flex;
     flex-direction: column;
-    gap: .5rem;
+    gap: 1rem;
 }
 
 .legends .legend {
@@ -317,7 +325,7 @@ nav button.active>i {
     display: grid;
     grid-template-columns: 10rem 10rem;
     width: fit-content;
-    gap: .5rem;
+    gap: 1rem;
 }
 
 .contacts a {

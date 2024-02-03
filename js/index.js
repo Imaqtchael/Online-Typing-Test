@@ -253,6 +253,8 @@ function updateLogChart() {
     parent.appendChild(logElement);
 
     logChart = new Chart("wpm_accuracy", { type: "line", data: logsChartDetails.data, options: logsChartDetails.options });
+
+    console.log(tertiaryColor);
 }
 
 let gameSettings = document.querySelector(".game-settings");
@@ -279,12 +281,78 @@ function blurTyping() {
     footer.style.visibility = "visible";
 }
 
+function changeLogChartColor() {
+    logChart.data.datasets[0].borderColor = tertiaryColor;
+    logChart.data.datasets[1].borderColor = headerColor;
+    logChart.update();
+}
+
+let isDarkMode = true;
+let primaryColor = "#323437";
+let secondarColor = "#2c2e31";
+let tertiaryColor = "#e2b714";
+let textColor = "#646669";
+let headerColor = "#d1d0c5";
+
+function toggleLightMode() {
+    primaryColor = "#e8e9ec";
+    secondarColor = "#ccceda";
+    tertiaryColor = "#2d539e";
+    textColor = "#adb1c4";
+    headerColor = "#33374c";
+
+    document.documentElement.style.setProperty("--primary-color", primaryColor);
+    document.documentElement.style.setProperty("--secondary-color", secondarColor);
+    document.documentElement.style.setProperty("--tertiary-color", tertiaryColor);
+    document.documentElement.style.setProperty("--text-color", textColor);
+    document.documentElement.style.setProperty("--header-color", headerColor);
+
+    toggleThemeButton.firstElementChild.classList.remove("fa-moon");
+    toggleThemeButton.firstElementChild.classList.add("fa-snowflake");
+
+    changeLogChartColor()
+}
+
+function toggleDarkMode() {
+    primaryColor = "#323437";
+    secondarColor = "#2c2e31";
+    tertiaryColor = "#e2b714";
+    textColor = "#646669";
+    headerColor = "#d1d0c5";
+
+    document.documentElement.style.setProperty("--primary-color", primaryColor);
+    document.documentElement.style.setProperty("--secondary-color", secondarColor);
+    document.documentElement.style.setProperty("--tertiary-color", tertiaryColor);
+    document.documentElement.style.setProperty("--text-color", textColor);
+    document.documentElement.style.setProperty("--header-color", headerColor);
+
+    toggleThemeButton.firstElementChild.classList.remove("fa-snowflake");
+    toggleThemeButton.firstElementChild.classList.add("fa-moon");
+
+    changeLogChartColor()
+}
+
+function toggleTheme() {
+    console.log(toggleThemeButton.firstElementChild.classList);
+    if (isDarkMode) {
+        isDarkMode = false;
+        toggleLightMode();
+    } else {
+        isDarkMode = true;
+        toggleDarkMode();
+    }
+    console.log(toggleThemeButton.firstElementChild.classList);
+}
+
+let toggleThemeButton = document.querySelector("#theme");
 let showTypingTestButton = document.querySelector("#typing-test");
 let showHistoryButton = document.querySelector("#history");
 let showMultiplayerButton = document.querySelector("#multiplayer");
 let typingTestBody = document.querySelector("#body");
 let historyBody = document.querySelector("#history-body");
 let multiplayerBody = document.querySelector("#multiplayer-body");
+
+toggleThemeButton.addEventListener("click", toggleTheme);
 
 showTypingTestButton.addEventListener("click", showTypingTest);
 showHistoryButton.addEventListener("click", showHistory);
@@ -368,14 +436,14 @@ let logsChartDetails = {
             label: "wpm",
             fill: true,
             backgroundColor: "rgba(0, 0, 0, 0.1)",
-            borderColor: "rgba(226, 183, 20, 0.7)",
+            borderColor: tertiaryColor,
             pointRadius: 2,
-            pointHoverRadius: 2,
+            pointHoverRadius: 4,
             pointBackgroundColor: function(context) {
                 let maximumValueIndex = context.dataset.data.indexOf(Math.max(...context.dataset.data));
                 let minimumValueIndex = context.dataset.data.indexOf(Math.min(...context.dataset.data));
                 let index = context.dataIndex;
-                return maximumValueIndex == index ? "red" : minimumValueIndex == index ? "rgb(100, 102, 105, 1.0)" : "rgb(226, 183, 20, 1.0)";
+                return maximumValueIndex == index ? "red" : minimumValueIndex == index ? "rgb(100, 102, 105, 1.0)" : tertiaryColor;
             },
             tension: 0.3,
             data: currentWPM
@@ -383,14 +451,14 @@ let logsChartDetails = {
             label: "raw",
             fill: true,
             backgroundColor: "rgba(0, 0, 0, 0.1)",
-            borderColor: "rgba(209, 208, 197, 0.7)",
+            borderColor: headerColor,
             pointRadius: 2,
-            pointHoverRadius: 2,
+            pointHoverRadius: 4,
             pointBackgroundColor: function(context) {
                 let maximumValueIndex = context.dataset.data.indexOf(Math.max(...context.dataset.data));
                 let minimumValueIndex = context.dataset.data.indexOf(Math.min(...context.dataset.data));
                 let index = context.dataIndex;
-                return maximumValueIndex == index ? "red" : minimumValueIndex == index ? "rgb(100, 102, 105, 1.0)" : "rgb(209, 208, 197, 1.0)";
+                return maximumValueIndex == index ? "red" : minimumValueIndex == index ? "rgb(100, 102, 105, 1.0)" : headerColor;
             },
             tension: 0.3,
             data: currentRawWPM
@@ -535,7 +603,7 @@ textarea.addEventListener("keydown", function(event) {
         } else {
             wrongInput += 1;
             totalWrongInput += 1;
-            textarea.style.caretColor = "red";
+            textarea.style.caretColor = "var(--wrong-color)";
 
             let index = Object.keys(currentMistakes).findIndex(key => currentMistakes[key].x == secondsPassed);
             if (index != -1) {

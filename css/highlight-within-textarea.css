@@ -62,7 +62,7 @@
 }
 
 .hwt-content mark.wrong {
-    background-color: red;
+    background-color: var(--wrong-color);
     color: var(--header-color);
 }
 
