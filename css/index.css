@@ -13,6 +13,11 @@
     --header-size: 3rem;
 }
 
+body,
+html {
+    font-size: 13px;
+}
+
 * {
     padding: 0;
     margin: 0;
@@ -521,7 +526,7 @@ footer {
     height: 200px;
 }
 
-#test-chart canvas {
+canvas {
     width: 100% !important;
 }
 
@@ -539,6 +544,10 @@ footer {
         --large-text: 1.5rem;
         --xlarge-text: 3.5rem;
     }
+    body,
+    html {
+        font-size: 13px;
+    }
     .body .game-settings {
         width: 100%;
         padding: 0 0 0 1rem;
@@ -553,12 +562,15 @@ footer {
     .paragraph mark {
         font-size: var(--large-text);
     }
-    .test-logs {
+    .test-logs,
+    .history-container {
         grid-template-columns: none;
         grid-template-rows: auto 1fr;
     }
     .wpm_accuracy_text {
+        margin: 0 auto;
         display: grid;
+        gap: 3rem;
         grid-template-columns: repeat(2, 1fr);
     }
     .contacts {
@@ -569,6 +581,9 @@ footer {
     }
     #words-input {
         width: 7rem;
+    }
+    #multiplayer-body>div {
+        font-size: 48px !important;
     }
 }
 

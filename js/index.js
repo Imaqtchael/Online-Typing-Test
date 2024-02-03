@@ -218,6 +218,8 @@ function showWPMAccuracy() {
     wpmText.parentElement.style.display = "block";
     logsChart.style.display = "grid";
     paragraph.style.display = "none";
+
+    changeLogChartColor();
 }
 
 function showLogsTest() {
@@ -282,14 +284,17 @@ function blurTyping() {
 }
 
 function changeLogChartColor() {
-    logChart.data.datasets[0].borderColor = tertiaryColor;
-    logChart.data.datasets[1].borderColor = headerColor;
+    if (logChart) {
+        logChart.data.datasets[0].borderColor = tertiaryColor;
+        logChart.data.datasets[1].borderColor = headerColor;
+        logChart.update();
+    }
 
-    historyLogChart.data.datasets[0].borderColor = headerColor;
-    historyLogChart.data.datasets[1].borderColor = tertiaryColor;
-
-    logChart.update();
-    historyLogChart.update();
+    if (historyLogChart) {
+        historyLogChart.data.datasets[0].borderColor = headerColor;
+        historyLogChart.data.datasets[1].borderColor = tertiaryColor;
+        historyLogChart.update();
+    }
 }
 
 let isDarkMode = true;
@@ -557,6 +562,16 @@ textarea.addEventListener("mousedown", function(event) {
 textarea.addEventListener("contextmenu", function(event) {
     event.preventDefault();
 });
+textarea.addEventListener("keypress", function(event) {
+    event.preventDefault();
+});
+textarea.addEventListener("keyup", function(event) {
+    event.preventDefault();
+    console.log(event);
+});
+textarea.addEventListener("input", function(event) {
+    event.preventDefault();
+});
 textarea.addEventListener("keydown", function(event) {
     event.preventDefault();
 
@@ -650,7 +665,6 @@ textarea.addEventListener("keydown", function(event) {
 
         accuracyText.textContent = accuracy;
         wpmText.textContent = wpm;
-        showWPMAccuracy();
 
         accuracyList.push(accuracy);
         wpmList.push(wpm);
@@ -673,6 +687,8 @@ textarea.addEventListener("keydown", function(event) {
 
         historyLogChart.update();
         updateLogChart();
+
+        showWPMAccuracy();
     } else {
         let typedWords = userInput.split(" ").length - 1;
         wordCount.textContent = typedWords;
