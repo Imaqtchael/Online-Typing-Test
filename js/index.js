@@ -67,6 +67,8 @@ async function generateQuote() {
 }
 
 async function generateRandom() {
+    validateMinRandomWords();
+
     hideWPMAccuracy();
     showLoading();
     wordButton.textContent = " words";
@@ -257,6 +259,14 @@ function updateLogChart() {
     logChart = new Chart("wpm_accuracy", { type: "line", data: logsChartDetails.data, options: logsChartDetails.options });
 }
 
+function validateMinRandomWords() {
+    let activeRadioButton = document.querySelector("input[name='mode']:checked");
+
+    if (activeRadioButton.value == "random" && wordsCountButton.value < 10) {
+        wordsCountButton.value = 10;
+    }
+}
+
 let gameSettings = document.querySelector(".game-settings");
 let navButtons = document.querySelector(".nav-buttons");
 let legends = document.querySelector(".legends");
@@ -364,14 +374,28 @@ showTypingTestButton.addEventListener("click", showTypingTest);
 showHistoryButton.addEventListener("click", showHistory);
 
 let paragraphButton = document.querySelector("#paragraph");
-paragraphButton.addEventListener("click", generateQuote);
+paragraphButton.addEventListener("click", () => {
+    wordsCountButton.value = parseInt(paragraphButton.getAttribute('data-title'));
+    generateQuote();
+});
 
 let randomButton = document.querySelector("#random");
-randomButton.addEventListener("click", generateRandom);
+randomButton.addEventListener("click", () => {
+    paragraphButton.setAttribute('data-title', wordsCountButton.value);
+
+    generateRandom();
+});
 
 let wordsCountButton = document.querySelector("#words-input");
-wordsCountButton.addEventListener("keypress", (event) => {
-    if (event.keyCode === 13) {
+wordsCountButton.addEventListener("keydown", (event) => {
+    validateMinRandomWords();
+
+    if (event.key == "Enter" || event.key == "Return") {
+        let activeRadioButton = document.querySelector("input[name='mode']:checked");
+        if (activeRadioButton.value == "paragraph") {
+            paragraphButton.setAttribute("data-default", paragraphButton.value);
+        }
+
         generateNewTypingTest();
     }
 })
