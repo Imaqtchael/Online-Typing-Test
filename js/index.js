@@ -255,8 +255,6 @@ function updateLogChart() {
     parent.appendChild(logElement);
 
     logChart = new Chart("wpm_accuracy", { type: "line", data: logsChartDetails.data, options: logsChartDetails.options });
-
-    console.log(tertiaryColor);
 }
 
 let gameSettings = document.querySelector(".game-settings");
@@ -343,7 +341,6 @@ function toggleDarkMode() {
 }
 
 function toggleTheme() {
-    console.log(toggleThemeButton.firstElementChild.classList);
     if (isDarkMode) {
         isDarkMode = false;
         toggleLightMode();
@@ -351,7 +348,6 @@ function toggleTheme() {
         isDarkMode = true;
         toggleDarkMode();
     }
-    console.log(toggleThemeButton.firstElementChild.classList);
 }
 
 let toggleThemeButton = document.querySelector("#theme");
@@ -567,7 +563,6 @@ textarea.addEventListener("keypress", function(event) {
 });
 textarea.addEventListener("keyup", function(event) {
     event.preventDefault();
-    console.log(event);
 });
 textarea.addEventListener("input", function(event) {
     event.preventDefault();

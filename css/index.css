@@ -536,6 +536,11 @@ canvas {
     transition: 0.2s;
 }
 
+#multiplayer-body>div>i {
+    color: var(--tertiary-color);
+    font-weight: bold;
+}
+
 @media only screen and (max-width: 560px) {
      :root {
         --text-size: 1.3rem;
