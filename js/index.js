@@ -284,7 +284,12 @@ function blurTyping() {
 function changeLogChartColor() {
     logChart.data.datasets[0].borderColor = tertiaryColor;
     logChart.data.datasets[1].borderColor = headerColor;
+
+    historyLogChart.data.datasets[0].borderColor = headerColor;
+    historyLogChart.data.datasets[1].borderColor = tertiaryColor;
+
     logChart.update();
+    historyLogChart.update();
 }
 
 let isDarkMode = true;
@@ -407,17 +412,16 @@ let correctInput = 0;
 let wrongInput = 0;
 let totalWrongInput = 0;
 let accuracyList = [];
-let accuracyListTries = [];
 let wpmList = [];
-let wpmListTries = [];
-// let currentWPM = [];
-// let currentRawWPM = [];
-// let currentTimeStamps = [];
-// let currentMistakes = [];
-let currentRawWPM = [70, 86, 90];
-let currentWPM = [60, 76, 80];
-let currentMistakes = [{ x: 2, y: 3 }]
-let currentTimeStamps = [1, 2, 3];
+let logTries = [];
+let currentWPM = [];
+let currentRawWPM = [];
+let currentTimeStamps = [];
+let currentMistakes = [];
+// let currentRawWPM = [70, 86, 90];
+// let currentWPM = [60, 76, 80];
+// let currentMistakes = [{ x: 2, y: 3 }]
+// let currentTimeStamps = [1, 2, 3];
 let oneTimeWrongInput = 0;
 let typingFinished = false;
 let startedTyping = false;
@@ -425,7 +429,9 @@ let secondsPassed = 0;
 let secondsPassedCounter;
 let wordCount = document.querySelector("#typed-word");
 let accuracyText = document.querySelector("#accuracy-text");
+let averageAccuracyText = document.querySelector("#average-accuracy-text");
 let wpmText = document.querySelector("#wpm-text");
+let averageWPMText = document.querySelector("#average-wpm-text");
 let logsChart = document.querySelector(".test-logs");
 let textarea = document.querySelector("textarea");
 let logsChartDetails = {
@@ -647,16 +653,25 @@ textarea.addEventListener("keydown", function(event) {
         showWPMAccuracy();
 
         accuracyList.push(accuracy);
-        accuracyListTries.push(accuracyList.length);
         wpmList.push(wpm);
-        wpmListTries.push(wpmList.length);
+        logTries.push(accuracyList.length);
+
+        let averageAccuracy = accuracyList.reduce((accumulator, currentValue) => {
+            return accumulator + currentValue;
+        }, 0) / accuracyList.length;
+
+        let averageWPM = wpmList.reduce((accumulator, currentValue) => {
+            return accumulator + currentValue;
+        }, 0) / wpmList.length;
+
+        averageAccuracyText.textContent = Math.round(averageAccuracy);
+        averageWPMText.textContent = Math.round(averageWPM);
 
         currentRawWPM.push(raw);
         currentWPM.push(wpm);
         currentTimeStamps.push((currentTimeStamps.length - 1) + 1);
 
-        wpmChart.update();
-        accuracyChart.update();
+        historyLogChart.update();
         updateLogChart();
     } else {
         let typedWords = userInput.split(" ").length - 1;
@@ -675,5 +690,6 @@ textarea.addEventListener("keydown", function(event) {
 let urlParams = new URLSearchParams(window.location.search);
 if (!urlParams.has("code")) {
     generateQuote();
+    // showHistory();
     // showLogsTest();
 }

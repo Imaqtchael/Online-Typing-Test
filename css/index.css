@@ -311,13 +311,25 @@ nav button.active>i {
     justify-content: center;
     align-items: center;
     flex: 1 1 auto;
-    width: 55%;
+    width: 100%;
     margin: 0 auto;
 }
 
-.accuracy-logs,
-.wpm-logs {
-    height: 20%;
+#history-body>div:first-child {
+    font-size: var(--large-text);
+    font-weight: 1000;
+    color: var(--header-color);
+}
+
+.history-container {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1rem;
+    width: 90%;
+}
+
+.history-logs {
+    height: 200px;
     width: 100%;
 }
 
