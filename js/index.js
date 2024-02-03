@@ -135,6 +135,7 @@ function showHistory() {
 }
 
 function generateNewTypingTest() {
+    blurTyping();
     let activeRadioButton = document.querySelector("input[name='mode']:checked");
     if (activeRadioButton.value == "paragraph") {
         generateQuote();
@@ -142,6 +143,8 @@ function generateNewTypingTest() {
         generateRandom();
     }
 }
+
+let lastTypedLength = 0;
 
 function startTimer() {
     secondsPassedCounter = setInterval(() => {
@@ -156,6 +159,12 @@ function startTimer() {
         if (secondsPassed >= 300) {
             generateNewTypingTest();
         }
+
+        if (lastTypedLength == input) {
+            blurTyping();
+        } else {
+            lastTypedLength = input;
+        }
     }, 1000);
 }
 
@@ -164,6 +173,8 @@ function stopTimer() {
 }
 
 function resetTypingTest() {
+    blurTyping();
+
     userInput = "";
     input = 0;
     correctInput = 0;
@@ -244,6 +255,30 @@ function updateLogChart() {
     logChart = new Chart("wpm_accuracy", { type: "line", data: logsChartDetails.data, options: logsChartDetails.options });
 }
 
+let gameSettings = document.querySelector(".game-settings");
+let navButtons = document.querySelector(".nav-buttons");
+let legends = document.querySelector(".legends");
+let contacts = document.querySelector(".contacts");
+let footer = document.querySelector("footer");
+
+function focusTyping() {
+    typingFocused = true;
+    gameSettings.style.visibility = "hidden";
+    navButtons.style.visibility = "hidden";
+    legends.style.visibility = "hidden";
+    contacts.style.visibility = "hidden";
+    footer.style.visibility = "hidden";
+}
+
+function blurTyping() {
+    typingFocused = false;
+    gameSettings.style.visibility = "visible";
+    navButtons.style.visibility = "visible";
+    legends.style.visibility = "visible";
+    contacts.style.visibility = "visible";
+    footer.style.visibility = "visible";
+}
+
 let showTypingTestButton = document.querySelector("#typing-test");
 let showHistoryButton = document.querySelector("#history");
 let showMultiplayerButton = document.querySelector("#multiplayer");
@@ -294,6 +329,7 @@ restartButton.addEventListener("click", resetTypingTest);
 
 // Typing Text Logic
 
+let typingFocused = false;
 let logChart;
 let userInput = "";
 let toBeTyped = "";
@@ -450,6 +486,12 @@ textarea.addEventListener("contextmenu", function(event) {
 textarea.addEventListener("keydown", function(event) {
     event.preventDefault();
 
+    input += 1;
+
+    if (!typingFocused) {
+        focusTyping();
+    }
+
     if (event.key == "Tab") {
         document.querySelector("#next-button").focus();
         return;
@@ -522,6 +564,7 @@ textarea.addEventListener("keydown", function(event) {
     })
 
     if (userInput == toBeTyped) {
+        blurTyping();
         typingFinished = true;
         startedTyping = false;
         stopTimer();
@@ -559,7 +602,6 @@ textarea.addEventListener("keydown", function(event) {
         textarea.blur();
         textarea.focus();
     }
-    input += 1;
 });
 
 let urlParams = new URLSearchParams(window.location.search);

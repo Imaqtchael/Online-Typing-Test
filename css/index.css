@@ -505,6 +505,12 @@ footer {
     width: 100% !important;
 }
 
+.focusable {
+    transition-timing-function: ease-in;
+    /* Quick on the way out */
+    transition: 0.2s;
+}
+
 @media only screen and (max-width: 560px) {
      :root {
         --text-size: 1.3rem;
@@ -536,6 +542,7 @@ footer {
         grid-template-columns: repeat(2, 1fr);
     }
     .contacts {
+        width: 100%;
         margin: 1rem 0;
         display: flex;
         justify-content: space-between;
