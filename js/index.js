@@ -591,18 +591,13 @@ function handleUserInput(uInput) {
         focusTyping();
     }
 
-    input += 1;
 
     if (!startedTyping) {
         startedTyping = true;
         startTimer();
-
-        let wpm = Math.floor((correctInput / 5) * (60 / 1));
-        let raw = Math.floor((input / 5) * (60 / 1));
-        currentWPM.push(wpm);
-        currentRawWPM.push(raw);
-        currentTimeStamps.push(0);
     }
+
+    input += 1;
 
     if (uInput == "Backspace") {
         if (userInput.length == 0) {
@@ -629,7 +624,7 @@ function handleUserInput(uInput) {
             totalWrongInput += 1;
             textarea.style.caretColor = "var(--wrong-color)";
 
-            let index = Object.keys(currentMistakes).findIndex(key => currentMistakes[key].x == secondsPassed);
+            let index = Object.keys(currentMistakes).findIndex(key => currentMistakes[key].x == secondsPassed > 0 ? secondsPassed : 1);
             if (index != -1) {
                 currentMistakes[index].y = wrongInput;
             } else {
