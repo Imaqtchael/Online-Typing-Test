@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
 :root {
     --primary-color: #323437;
     --secondary-color: #2c2e31;
@@ -26,6 +27,7 @@ html {
     font-family: monospace;
     background-color: var(--primary-color);
     color: var(--text-color);
+    user-select: none;
 }
 
 
@@ -76,6 +78,21 @@ nav p {
     color: var(--header-color);
     flex: 0 1 auto;
     font-size: var(--header-size);
+}
+
+nav svg {
+    fill: var(--tertiary-color);
+    height: var(--large-text);
+    width: fit-content;
+    margin-top: .3rem;
+    font-family: 'Varela Round';
+}
+
+nav .logo {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: .5rem;
+    align-items: center;
 }
 
 nav span {
@@ -596,6 +613,12 @@ footer {
     body,
     html {
         font-size: 12px;
+    }
+    nav p {
+        display: none;
+    }
+    nav svg {
+        margin-top: 0;
     }
     .body .game-settings {
         width: 100%;
