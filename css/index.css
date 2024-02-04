@@ -28,6 +28,9 @@ html {
     color: var(--text-color);
 }
 
+
+/* Input styles */
+
 .textbox-control {
     display: block;
     padding: 0.4rem 1rem;
@@ -39,10 +42,16 @@ html {
     color: var(--header-color);
 }
 
+
+/* CSS for selected texts */
+
 ::selection {
     background: var(--tertiary-color);
     color: var(--primary-color);
 }
+
+
+/* Container for the whole website */
 
 .whole {
     display: flex;
@@ -53,6 +62,9 @@ html {
     padding: 1rem;
     margin: 0 auto;
 }
+
+
+/* Navigation */
 
 nav {
     display: flex;
@@ -101,6 +113,9 @@ nav button.active>i {
     color: var(--header-color);
 }
 
+
+/* Custom tooltip for icons */
+
 [data-title]:hover:after {
     opacity: 1;
     transition: all 0.1s ease 0.5s;
@@ -128,6 +143,9 @@ nav button.active>i {
     position: relative;
 }
 
+
+/* Body */
+
 .body {
     flex: 1 1 auto;
     display: flex;
@@ -135,6 +153,9 @@ nav button.active>i {
     align-items: center;
     justify-content: center;
 }
+
+
+/* Game settings */
 
 .body .game-settings {
     margin-top: auto;
@@ -198,6 +219,9 @@ nav button.active>i {
     gap: 1rem;
 }
 
+
+/* Word count */
+
 .body .word-count {
     display: flex;
     width: 100%;
@@ -228,6 +252,9 @@ nav button.active>i {
     padding: .5rem;
 }
 
+
+/* Textarea */
+
 .paragraph {
     display: flex;
     align-items: center;
@@ -251,6 +278,10 @@ nav button.active>i {
 .paragraph textarea::selection {
     background: var(--primary-color);
     color: var(--text-color);
+}
+
+canvas {
+    width: 100% !important;
 }
 
 .paragraph-buttons {
@@ -287,6 +318,9 @@ nav button.active>i {
     font-size: var(--medium-text);
 }
 
+
+/* Legend */
+
 .legends {
     margin-top: auto;
     display: flex;
@@ -308,6 +342,9 @@ nav button.active>i {
     padding: .5rem;
     border-radius: 3px;
 }
+
+
+/* History */
 
 #history-body,
 #multiplayer-body {
@@ -337,6 +374,9 @@ nav button.active>i {
     height: 200px;
     width: 100%;
 }
+
+
+/* Contact links */
 
 .contacts {
     display: grid;
@@ -369,21 +409,22 @@ nav button.active>i {
     font-size: var(--small-text);
 }
 
+
+/* Footer */
+
 footer {
     flex: 0 1 fit-content;
     text-align: center;
     user-select: all;
 }
 
-#loading {
-    display: none;
+
+/* Multiplayer mode css */
+
+#multiplayer-body>div>i {
+    color: var(--tertiary-color);
+    font-weight: bold;
 }
-
-
-/* #test-logs {
-    display: none;
-    
-} */
 
 #multiplayer-loading {
     display: flex;
@@ -453,6 +494,44 @@ footer {
     color: var(--text-color);
 }
 
+
+/* Current test logs chart */
+
+.test-logs {
+    display: none;
+    grid-template-columns: auto 1fr;
+    gap: 1rem;
+    width: 90%;
+}
+
+.wpm_accuracy_text * {
+    display: block;
+    font-size: var(--xlarge-text);
+    line-height: var(--xlarge-text);
+}
+
+.wpm_accuracy_text span[id],
+.wpm_accuracy_text p {
+    display: inline-block;
+    color: var(--tertiary-color);
+}
+
+.wpm_accuracy_text>span:nth-child(odd) {
+    font-size: var(--header-size);
+}
+
+#test-chart {
+    width: 100%;
+    height: 200px;
+}
+
+
+/* Loading */
+
+#loading {
+    display: none;
+}
+
 .loader {
     width: 48px;
     height: 48px;
@@ -496,50 +575,15 @@ footer {
 }
 
 
-/* logs text*/
-
-.test-logs {
-    display: none;
-    grid-template-columns: auto 1fr;
-    gap: 1rem;
-    width: 90%;
-}
-
-.wpm_accuracy_text * {
-    display: block;
-    font-size: var(--xlarge-text);
-    line-height: var(--xlarge-text);
-}
-
-.wpm_accuracy_text span[id],
-.wpm_accuracy_text p {
-    display: inline-block;
-    color: var(--tertiary-color);
-}
-
-.wpm_accuracy_text>span:nth-child(odd) {
-    font-size: var(--header-size);
-}
-
-#test-chart {
-    width: 100%;
-    height: 200px;
-}
-
-canvas {
-    width: 100% !important;
-}
+/* Class for elements that will show/hide when typing */
 
 .focusable {
     transition-timing-function: ease-in;
-    /* Quick on the way out */
     transition: 0.2s;
 }
 
-#multiplayer-body>div>i {
-    color: var(--tertiary-color);
-    font-weight: bold;
-}
+
+/* Responsive Design */
 
 @media only screen and (max-width: 560px) {
      :root {
@@ -551,7 +595,7 @@ canvas {
     }
     body,
     html {
-        font-size: 13px;
+        font-size: 12px;
     }
     .body .game-settings {
         width: 100%;
