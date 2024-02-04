@@ -23,8 +23,9 @@ function fetchQuote() {
 }
 
 function fetchRandom(words) {
+    let randomLength = getRandomInteger(4, 6);
     return new Promise(resolve => {
-        $.get("https://random-word-api.herokuapp.com/word?number=" + words, function(data) {
+        $.get("https://random-word-api.herokuapp.com/word?lang=en&length=" + randomLength + "&number=" + words, function(data) {
             resolve(data);
         });
     });
@@ -576,38 +577,21 @@ let logsChartDetails = {
     }
 };
 
-textarea.addEventListener("mousedown", function(event) {
-    event.preventDefault();
-});
-textarea.addEventListener("contextmenu", function(event) {
-    event.preventDefault();
-});
-textarea.addEventListener("keypress", function(event) {
-    event.preventDefault();
-});
-textarea.addEventListener("keyup", function(event) {
-    event.preventDefault();
-});
-textarea.addEventListener("input", function(event) {
-    event.preventDefault();
-});
-textarea.addEventListener("keydown", function(event) {
-    event.preventDefault();
+function handleUserInput(uInput) {
+    if (uInput == "Tab") {
+        document.querySelector("#next-button").focus();
+        return;
+    }
 
-    input += 1;
+    if ((userInput.length == toBeTyped.length && !typingFinished && uInput != "Backspace") || typingFinished || !/^[a-zA-Z0-9\!\@\#\$\%\^\&\*\(\)\_\-\+\=\{\[\}\]\|\\\:\;\"\'\<\,\>\.\?\/ ]$/.test(uInput) && uInput != "Backspace") {
+        return;
+    }
 
     if (!typingFocused) {
         focusTyping();
     }
 
-    if (event.key == "Tab") {
-        document.querySelector("#next-button").focus();
-        return;
-    }
-
-    if ((userInput.length == toBeTyped.length && !typingFinished && event.key != "Backspace") || typingFinished || (!/^[a-zA-Z0-9\!\@\#\$\%\^\&\*\(\)\_\-\+\=\{\[\}\]\|\\\:\;\"\'\<\,\>\.\?\/ ]$/.test(event.key) || (event.shiftKey && !/^[A-Z\!\@\#\$\%\^\&\*\(\)\_\-\+\=\{\[\}\]\|\\\:\;\"\'\<\,\>\.\?\/ ]*$/.test(event.key))) && event.key != "Backspace") {
-        return;
-    }
+    input += 1;
 
     if (!startedTyping) {
         startedTyping = true;
@@ -620,7 +604,7 @@ textarea.addEventListener("keydown", function(event) {
         currentTimeStamps.push(0);
     }
 
-    if (event.key == "Backspace") {
+    if (uInput == "Backspace") {
         if (userInput.length == 0) {
             return;
         }
@@ -636,7 +620,7 @@ textarea.addEventListener("keydown", function(event) {
             correctInput -= 1;
         }
     } else {
-        userInput += event.key;
+        userInput += uInput;
         if (userInput[userInput.length - 1] == toBeTyped[userInput.length - 1] && wrongInput == 0) {
             correctInput += 1;
             textarea.style.caretColor = "var(--tertiary-color)";
@@ -720,6 +704,29 @@ textarea.addEventListener("keydown", function(event) {
         textarea.blur();
         textarea.focus();
     }
+}
+
+textarea.addEventListener("mousedown", function(event) {
+    event.preventDefault();
+});
+textarea.addEventListener("contextmenu", function(event) {
+    event.preventDefault();
+});
+textarea.addEventListener("keypress", function(event) {
+    event.preventDefault();
+});
+textarea.addEventListener("keyup", function(event) {
+    event.preventDefault();
+});
+textarea.addEventListener("input", function(event) {
+    textarea.value = toBeTyped;
+    handleUserInput(event.inputType == "deleteContentBackward" ? "Backspace" : event.data);
+    event.preventDefault();
+});
+textarea.addEventListener("keydown", function(event) {
+    if (event.key == "Unidentified") return;
+    handleUserInput(event.key);
+    event.preventDefault();
 });
 
 let urlParams = new URLSearchParams(window.location.search);
