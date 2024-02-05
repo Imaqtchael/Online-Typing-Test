@@ -480,7 +480,7 @@ nextButton.addEventListener("keydown", event => {
     if (event.key == "Enter") {
         generateNewTypingTest();
     } else if (event.key == "Tab") {
-        document.querySelector("#restart-button").focus();
+        restartButton.focus();
     }
 });
 nextButton.addEventListener("click", generateNewTypingTest);
@@ -490,6 +490,8 @@ restartButton.addEventListener("keydown", event => {
     event.preventDefault();
     if (event.key == "Enter") {
         resetTypingTest();
+    } else if (event.key == "Tab") {
+        nextButton.focus();
     }
 });
 restartButton.addEventListener("click", resetTypingTest);
@@ -795,7 +797,7 @@ textarea.addEventListener("keydown", function(event) {
 setWebIcon();
 let urlParams = new URLSearchParams(window.location.search);
 if (!urlParams.has("code")) {
-    generateQuote();
+    generateRandom();
     // showMultiplayer();
     // showHistory();
     // showLogsTest();
