@@ -22,8 +22,10 @@ function fetchQuote() {
     });
 }
 
+let baseLink = "https://mjbarcenas.github.io/keybored";
+
 async function fetchRandom(words) {
-    let allText = await readTextFile("../easy_words.txt");
+    let allText = await readTextFile(baseLink + "/easy_words.txt");
     let result = [];
     return new Promise(resolve => {
         for (let i = 0; i < words; i++) {
@@ -791,7 +793,7 @@ let urlParams = new URLSearchParams(window.location.search);
 if (!urlParams.has("code")) {
     generateQuote();
     setWebIcon();
-    showMultiplayer();
+    // showMultiplayer();
     // showHistory();
     // showLogsTest();
 }
