@@ -449,18 +449,23 @@ showMultiplayerButton.addEventListener("click", showMultiplayer);
 let previousMode = "random";
 
 let paragraphButton = document.querySelector("#paragraph");
+let randomButton = document.querySelector("#random");
 paragraphButton.addEventListener("click", () => {
+    if (previousMode == "random") {
+        randomButton.setAttribute('data-title', wordsCountButton.value);
+    }
     wordsCountButton.value = parseInt(paragraphButton.getAttribute('data-title'));
 
     previousMode = "paragraph";
     generateQuote();
 });
 
-let randomButton = document.querySelector("#random");
 randomButton.addEventListener("click", () => {
     if (previousMode == "paragraph") {
         paragraphButton.setAttribute('data-title', wordsCountButton.value);
     }
+    wordsCountButton.value = parseInt(randomButton.getAttribute('data-title'));
+
     previousMode = "random";
     generateRandom();
 });
