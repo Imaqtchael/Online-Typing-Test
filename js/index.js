@@ -12,7 +12,7 @@ function readTextFile(file) {
         rawFile.onreadystatechange = function() {
             if (rawFile.readyState === 4) {
                 if (rawFile.status === 200 || rawFile.status == 0) {
-                    var allText = document.location.protocol == "https" ? rawFile.responseText.split("\n") : rawFile.responseText.split("\r\n");
+                    var allText = document.location.protocol == "https:" ? rawFile.responseText.split("\n") : rawFile.responseText.split("\r\n");
                     resolve(allText);
                 }
             }
@@ -39,7 +39,7 @@ function fetchQuote() {
 }
 
 async function fetchRandom(words) {
-    let allText = await readTextFile("../easy_words.txt");
+    let allText = await readTextFile("easy_words.txt");
     let result = [];
     return new Promise(resolve => {
         for (let i = 0; i < words; i++) {
