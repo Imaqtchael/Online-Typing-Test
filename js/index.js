@@ -43,7 +43,7 @@ async function fetchRandom(words) {
     let result = [];
     return new Promise(resolve => {
         for (let i = 0; i < words; i++) {
-            result.push(allText[getRandomInteger(0, allText.length)]);
+            result.push(allText[getRandomInteger(0, allText.length)].trim());
         }
 
         resolve(result);
@@ -83,7 +83,7 @@ async function generateQuote() {
         initial.push(result);
     }
 
-    toBeTyped = initial.join(" ").trim();
+    toBeTyped = initial.split(" ").trim().join(" ");
     toBeTypedWordCount = toBeTyped.split(" ").length;
 
     let wordTotalSpan = document.querySelector("#word-total");
