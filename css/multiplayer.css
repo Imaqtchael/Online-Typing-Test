@@ -1,6 +1,6 @@
 #multiplayer-body {
     display: none;
-    gap: 5rem;
+    gap: 3rem;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -32,6 +32,14 @@
 
 #copy-link-button {
     cursor: pointer;
+}
+
+#countdown-timer,
+#winner-text-div {
+    width: 100%;
+    font-size: var(--header-size);
+    color: var(--tertiary-color);
+    text-align: center;
 }
 
 #player-div>.player-title {

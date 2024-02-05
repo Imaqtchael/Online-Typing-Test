@@ -220,25 +220,28 @@ function generateNewTypingTest() {
 
 let lastTypedLength = 0;
 
+function manageCurrentTest() {
+    let wpm = Math.floor((correctInput / 5) * (60 / secondsPassed));
+    let raw = Math.floor((input / 5) * (60 / secondsPassed));
+    currentWPM.push(wpm);
+    currentRawWPM.push(raw);
+    currentTimeStamps.push(secondsPassed);
+
+    if (secondsPassed >= 200) {
+        generateNewTypingTest();
+    }
+
+    if (lastTypedLength == input) {
+        blurTyping();
+    } else {
+        lastTypedLength = input;
+    }
+}
+
 function startTimer() {
     secondsPassedCounter = setInterval(() => {
         secondsPassed += 1;
-
-        let wpm = Math.floor((correctInput / 5) * (60 / secondsPassed));
-        let raw = Math.floor((input / 5) * (60 / secondsPassed));
-        currentWPM.push(wpm);
-        currentRawWPM.push(raw);
-        currentTimeStamps.push(secondsPassed);
-
-        if (secondsPassed >= 200) {
-            generateNewTypingTest();
-        }
-
-        if (lastTypedLength == input) {
-            blurTyping();
-        } else {
-            lastTypedLength = input;
-        }
+        manageCurrentTest();
     }, 1000);
 }
 
@@ -332,8 +335,8 @@ function updateLogChart() {
 }
 
 function validateMinRandomWords() {
-    if (wordsCountButton.value < 10) {
-        wordsCountButton.value = 10;
+    if (wordsCountInput.value < 10) {
+        wordsCountInput.value = 10;
     }
 }
 
@@ -452,9 +455,9 @@ let paragraphButton = document.querySelector("#paragraph");
 let randomButton = document.querySelector("#random");
 paragraphButton.addEventListener("click", () => {
     if (previousMode == "random") {
-        randomButton.setAttribute('data-title', wordsCountButton.value);
+        randomButton.setAttribute('data-title', wordsCountInput.value);
     }
-    wordsCountButton.value = parseInt(paragraphButton.getAttribute('data-title'));
+    wordsCountInput.value = parseInt(paragraphButton.getAttribute('data-title'));
 
     previousMode = "paragraph";
     generateQuote();
@@ -462,16 +465,16 @@ paragraphButton.addEventListener("click", () => {
 
 randomButton.addEventListener("click", () => {
     if (previousMode == "paragraph") {
-        paragraphButton.setAttribute('data-title', wordsCountButton.value);
+        paragraphButton.setAttribute('data-title', wordsCountInput.value);
     }
-    wordsCountButton.value = parseInt(randomButton.getAttribute('data-title'));
+    wordsCountInput.value = parseInt(randomButton.getAttribute('data-title'));
 
     previousMode = "random";
     generateRandom();
 });
 
-let wordsCountButton = document.querySelector("#words-input");
-wordsCountButton.addEventListener("keydown", (event) => {
+let wordsCountInput = document.querySelector("#words-input");
+wordsCountInput.addEventListener("keydown", (event) => {
     if (event.key == "Enter" || event.key == "Return") {
         generateNewTypingTest();
     }
@@ -806,7 +809,7 @@ setWebIcon();
 let urlParams = new URLSearchParams(window.location.search);
 if (!urlParams.has("code")) {
     generateRandom();
-    // showMultiplayer();
+    showMultiplayer();
     // showHistory();
     // showLogsTest();
 }
