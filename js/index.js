@@ -22,13 +22,27 @@ function fetchQuote() {
     });
 }
 
-function fetchRandom(words) {
-    let randomLength = getRandomInteger(4, 6);
+async function fetchRandom(words) {
+    let allText = await readTextFile("../easy_words.txt");
+    let result = [];
     return new Promise(resolve => {
-        $.get("https://random-word-api.herokuapp.com/word?lang=en&length=" + randomLength + "&number=" + words, function(data) {
-            resolve(data);
-        });
-    });
+        for (let i = 0; i < words; i++) {
+            result.push(allText[getRandomInteger(0, allText.length)]);
+        }
+
+        resolve(result);
+    })
+
+    // **************************************
+    // If you want to use an API then comment the code above and uncomment the code below
+    // **************************************
+
+    // let randomLength = getRandomInteger(4, 6);
+    // return new Promise(resolve => {
+    //     $.get("https://random-word-api.herokuapp.com/word?lang=en&length=" + randomLength + "&number=" + words, function(data) {
+    //         resolve(data);
+    //     });
+    // });
 }
 
 function setWebIcon() {
@@ -63,6 +77,11 @@ async function generateQuote() {
     textarea.value = toBeTyped;
     hideLoading();
     resetTypingTest();
+
+    // **************************************************
+    // Deprecated, the site cannot be used if your site has https
+    // **************************************************
+
     // $.get("//metaphorpsum.com/paragraphs/1/" + words + "/", function(result) {
     //     toBeTyped = result;
     //     toBeTypedWordCount = toBeTyped.split(" ").length;
@@ -665,7 +684,7 @@ function handleUserInput(uInput) {
     textarea.selectionEnd = cursorPosition;
     textarea.selectionStart = cursorPosition;
 
-    $("textarea").highlightWithinTextarea({
+    $("#single-player-textarea").highlightWithinTextarea({
         highlight: [{
             highlight: correctInput > 0 ? [0, correctInput] : null,
             className: "correct"
@@ -751,6 +770,22 @@ textarea.addEventListener("keydown", function(event) {
     handleUserInput(event.key);
     event.preventDefault();
 });
+
+function readTextFile(file) {
+    return new Promise((resolve) => {
+        var rawFile = new XMLHttpRequest();
+        rawFile.open("GET", file, false);
+        rawFile.onreadystatechange = function() {
+            if (rawFile.readyState === 4) {
+                if (rawFile.status === 200 || rawFile.status == 0) {
+                    var allText = rawFile.responseText.split("\r\n");
+                    resolve(allText);
+                }
+            }
+        }
+        rawFile.send();
+    });
+}
 
 let urlParams = new URLSearchParams(window.location.search);
 if (!urlParams.has("code")) {
