@@ -44,7 +44,7 @@
     border: none;
     width: 100%;
     outline: none;
-    font-size: 1.8rem;
+    font-size: var(--large-text);
     caret-color: var(--tertiary-color);
     overflow: hidden;
 }

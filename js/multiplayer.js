@@ -1,76 +1,103 @@
-// import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-// import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
 
-// const firebaseSettings = {
-//     databaseURL: "https://keybored-cc9f6-default-rtdb.asia-southeast1.firebasedatabase.app/"
-// };
+const firebaseSettings = {
+    databaseURL: "https://keybored-cc9f6-default-rtdb.asia-southeast1.firebasedatabase.app/"
+};
 
-// const app = initializeApp(firebaseSettings);
-// const database = getDatabase(app);
-// let multiplayerEntry, self;
+const app = initializeApp(firebaseSettings);
+const database = getDatabase(app);
+let multiplayerEntry, self;
 
+function initializeMultiplayer() {
+    generatePlayerID();
+    if (localStorage.getItem("code") == null) {
+        generateMultiplayerLink();
+    } else {
+        setCodeToInput(multiplayerBaseLink + localStorage.getItem("code"));
+    }
+    // createFirebaseMultiplayerEntry(multiplayerEntry);
+}
 
 let alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 let num = "0123456789";
+let multiplayerBaseLink = "https://mjbarcenas.github.io/keybored?code=";
 
-function showMultiplayer() {
-    // generateMultiplayerLink();
-    // createFirebaseMultiplayerEntry(multiplayerEntry);
-
-    if (activeNavButton) {
-        activeNavButton.classList.remove("active");
+function generateMultiplayerLink() {
+    let code = "";
+    for (let i = 0; i < 3; i++) {
+        code += `${alphabet[getRandomInteger(0, alphabet.length - 1)]}${num[getRandomInteger(0, num.length - 1)]}`;
     }
 
-    activeNavButton = showMultiplayerButton;
-    activeNavButton.classList.add("active");
-
-    multiplayerBody.style.display = "flex";
-    typingTestBody.style.display = "none";
-    historyBody.style.display = "none";
+    self = "player1";
+    multiplayerEntry = localStorage.getItem("user-id");
+    localStorage.setItem("code", code);
+    setCodeToInput(multiplayerBaseLink + code)
 }
-showMultiplayerButton.addEventListener("click", showMultiplayer);
 
-// function generateMultiplayerLink() {
-//     let code = "";
-//     for (let i = 0; i < 3; i++) {
-//         code += `${alphabet[getRandomInteger(0, alphabet.length - 1)]}${num[getRandomInteger(0, num.length - 1)]}`;
-//     }
+async function createFirebaseMultiplayerEntry(code) {
+    let length = getRandomInteger(30, 60);
+    let text = await fetchQuote();
 
-//     let link = "https://mjbarcenas.github.io/Online-Typing-Test?code=" + code;
-//     let codeInput = document.querySelector("#multiplayer-link");
-//     codeInput.value = link;
-//     multiplayerEntry = code;
-//     self = "player1";
-// }
+    let gameDetails = {
+        text: text,
+        player1Input: "",
+        player2Input: "",
+        player2present: false
+    }
+    push(ref(database, code), gameDetails);
+}
 
-// function copyMultiplayerLink() {
-//     let linkInput = document.querySelector("#multiplayer-link");
-//     linkInput.select();
-//     linkInput.setSelectionRange(0, 9999);
+function deleteFirebaseMultiplayerEntry(code) {
+    let entry = ref(database, code);
+    remove(entry);
+}
 
-//     navigator.clipboard.writeText(linkInput.value);
+function generatePlayerID() {
+    let code = "user";
+    for (let i = 0; i < 3; i++) {
+        code += `${alphabet[getRandomInteger(0, alphabet.length - 1)]}${num[getRandomInteger(0, num.length - 1)]}`;
+    }
 
-//     let copyButton = document.querySelector("#copy-url-button");
-//     copyButton.textContent = "copied!";
-// }
+    localStorage.setItem("user-id", code);
+}
 
-// let copyLinkButton = document.querySelector("#copy-url-button");
-// copyLinkButton.addEventListener("click", copyMultiplayerLink);
+function setCodeToInput(link) {
+    let codeInput = document.querySelector("#code-link-input");
+    codeInput.value = link;
+}
 
-// async function createFirebaseMultiplayerEntry(code) {
-//     let length = getRandomInteger(30, 60);
-//     let text = await fetchQuote();
+function copyMultiplayerLink() {
+    let linkInput = document.querySelector("#code-link-input");
+    linkInput.select();
+    linkInput.setSelectionRange(0, this.value.length);
 
-//     let gameDetails = {
-//         text: text,
-//         player1Input: "",
-//         player2Input: "",
-//         player2present: false
-//     }
-//     push(ref(database, code), gameDetails);
-// }
+    navigator.clipboard.writeText(linkInput.value);
 
-// function deleteFirebaseMultiplayerEntry(code) {
-//     let entry = ref(database, code);
-//     remove(entry);
-// }
+    let copyButton = document.querySelector("#copy-link-button");
+    copyButton.textContent = "copied!";
+    copyButton.style.backgroundColor = "var(--secondary-color)";
+    copyButton.style.color = "var(--header-color)";
+    setTimeout(() => {
+        copyButton.textContent = "copy";
+        copyButton.style.backgroundColor = "var(--tertiary-color)";
+        copyButton.style.color = "var(--primary-color)";
+    }, 2000);
+}
+
+let copyLinkButton = document.querySelector("#copy-link-button");
+copyLinkButton.addEventListener("click", copyMultiplayerLink);
+
+let linkInput = document.querySelector("#code-link-input");
+linkInput.addEventListener("click", () => {
+    linkInput.setSelectionRange(0, linkInput.value.length);
+});
+
+let html = document.querySelector("html");
+html.addEventListener("mousedown", event => {
+    if (event.target != linkInput && linkInput.selectionEnd > 1) {
+        linkInput.setSelectionRange(0, 0);
+    }
+})
+
+initializeMultiplayer();

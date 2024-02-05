@@ -45,6 +45,18 @@ html {
 }
 
 
+/* Button styles */
+
+.button-control {
+    outline: none;
+    border: none;
+    border-radius: 5px;
+    padding: .5rem 1rem;
+    background-color: var(--tertiary-color);
+    color: var(--primary-color);
+}
+
+
 /* CSS for selected texts */
 
 ::selection {
@@ -363,8 +375,7 @@ canvas {
 
 /* History */
 
-#history-body,
-#multiplayer-body {
+#history-body {
     display: none;
     flex-direction: column;
     justify-content: center;
@@ -433,82 +444,6 @@ footer {
     flex: 0 1 fit-content;
     text-align: center;
     user-select: all;
-}
-
-
-/* Multiplayer mode css */
-
-#multiplayer-body>div>i {
-    color: var(--tertiary-color);
-    font-weight: bold;
-}
-
-#multiplayer-loading {
-    display: flex;
-}
-
-#multiplayer-body div:not(:first-child) {
-    width: 100%;
-}
-
-.code-popup {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 100;
-    background-color: rgba(0, 0, 0, 0.75);
-    height: 100%;
-    width: 100%;
-}
-
-.code-body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 2rem;
-    padding: 2rem;
-    border-radius: 0.5rem;
-    min-height: 10rem;
-    min-width: 10rem;
-}
-
-.code-body>input {
-    outline: none;
-    border: 2px solid transparent;
-    border-radius: 0.5rem;
-    background-color: var(--secondary-color);
-    font-size: var(--text-size);
-    padding: .5rem;
-    width: 100%;
-    color: var(--header-color)
-}
-
-.code-body>input:focus-visible {
-    border-color: var(--header-color);
-}
-
-.code-body>p {
-    font-size: var(--text-size);
-}
-
-.code-body>button {
-    width: 100%;
-    font-size: var(--medium-text);
-    padding: 0.5rem;
-    outline: none;
-    border: none;
-    border-radius: 0.5rem;
-    background-color: var(--secondary-color);
-}
-
-.code-body>button:hover {
-    cursor: pointer;
-    background-color: var(--header-color);
-    color: var(--text-color);
 }
 
 
@@ -656,6 +591,9 @@ footer {
     }
     #multiplayer-body>div {
         font-size: 48px !important;
+    }
+    .code-link {
+        width: 100%;
     }
 }
 

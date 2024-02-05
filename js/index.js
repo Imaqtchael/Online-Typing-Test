@@ -146,6 +146,22 @@ function showHistory() {
     multiplayerBody.style.display = "none";
 }
 
+function showMultiplayer() {
+    // generateMultiplayerLink();
+    // createFirebaseMultiplayerEntry(multiplayerEntry);
+
+    if (activeNavButton) {
+        activeNavButton.classList.remove("active");
+    }
+
+    activeNavButton = showMultiplayerButton;
+    activeNavButton.classList.add("active");
+
+    multiplayerBody.style.display = "flex";
+    typingTestBody.style.display = "none";
+    historyBody.style.display = "none";
+}
+
 function generateNewTypingTest() {
     blurTyping();
     let activeRadioButton = document.querySelector("input[name='mode']:checked");
@@ -319,20 +335,20 @@ function changeLogChartColor() {
 
 let isDarkMode = true;
 let primaryColor = "#323437";
-let secondarColor = "#2c2e31";
+let secondaryColor = "#2c2e31";
 let tertiaryColor = "#e2b714";
 let textColor = "#646669";
 let headerColor = "#d1d0c5";
 
 function toggleLightMode() {
     primaryColor = "#e8e9ec";
-    secondarColor = "#ccceda";
+    secondaryColor = "#ccceda";
     tertiaryColor = "#2d539e";
     textColor = "#adb1c4";
     headerColor = "#33374c";
 
     document.documentElement.style.setProperty("--primary-color", primaryColor);
-    document.documentElement.style.setProperty("--secondary-color", secondarColor);
+    document.documentElement.style.setProperty("--secondary-color", secondaryColor);
     document.documentElement.style.setProperty("--tertiary-color", tertiaryColor);
     document.documentElement.style.setProperty("--text-color", textColor);
     document.documentElement.style.setProperty("--header-color", headerColor);
@@ -345,13 +361,13 @@ function toggleLightMode() {
 
 function toggleDarkMode() {
     primaryColor = "#323437";
-    secondarColor = "#2c2e31";
+    secondaryColor = "#2c2e31";
     tertiaryColor = "#e2b714";
     textColor = "#646669";
     headerColor = "#d1d0c5";
 
     document.documentElement.style.setProperty("--primary-color", primaryColor);
-    document.documentElement.style.setProperty("--secondary-color", secondarColor);
+    document.documentElement.style.setProperty("--secondary-color", secondaryColor);
     document.documentElement.style.setProperty("--tertiary-color", tertiaryColor);
     document.documentElement.style.setProperty("--text-color", textColor);
     document.documentElement.style.setProperty("--header-color", headerColor);
@@ -384,6 +400,7 @@ toggleThemeButton.addEventListener("click", toggleTheme);
 
 showTypingTestButton.addEventListener("click", showTypingTest);
 showHistoryButton.addEventListener("click", showHistory);
+showMultiplayerButton.addEventListener("click", showMultiplayer);
 
 let paragraphButton = document.querySelector("#paragraph");
 paragraphButton.addEventListener("click", () => {
@@ -739,6 +756,7 @@ let urlParams = new URLSearchParams(window.location.search);
 if (!urlParams.has("code")) {
     generateQuote();
     setWebIcon();
+    showMultiplayer();
     // showHistory();
     // showLogsTest();
 }

@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" data-title="da" type="image/svg+xml" sizes="32x32 64x64">
-    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/multiplayer.css">
     <link rel="stylesheet" href="css/highlight-within-textarea.css">
+    <link rel="stylesheet" href="css/index.css">
     <title>keybored | A monkeytype clone</title>
 </head>
 
@@ -108,9 +109,29 @@
             </div>
         </div>
         <div id="multiplayer-body">
-            <div style="font-size: 72px; text-align: center; color: var(--text-color); width: 100%;">
-                multiplayer mode <i>coming soon</i>. pahinga muna ako 🤡.
+            <div class="code-link">
+                <input type="text" id="code-link-input" class="textbox-control" readonly>
+                <button id="copy-link-button" class="button-control">copy</button>
             </div>
+            <div id="enemy-div">
+                <div class="player-title">
+                    enemy's text
+                </div>
+                <div class="paragraph">
+                    <textarea id="enemy-textarea" rows="3" spellcheck="false" disabled>Lorem ipsum dolor sit amet consectetur adipisicing elit. Impedit delectus non iure consectetur, dolore recusandae porro deleniti dignissimos a obcaecati sequi quis? Assumenda eveniet nobis culpa ab soluta aspernatur maiores, unde eaque neque itaque ad minima libero ducimus enim impedit fuga est voluptatum accusantium commodi nihil consequatur quo! Adipisci aut libero qui in, officiis a perferendis harum hic sequi eveniet enim illum sit sint nam aliquid repudiandae dolorum unde fugit architecto, modi distinctio ad, assumenda atque ab! Eius dignissimos similique quo consequatur assumenda ad quibusdam ipsa amet! Corporis perspiciatis velit sunt voluptatibus sapiente quasi minus ea magnam est repellendus voluptate aspernatur atque error, laudantium laborum distinctio adipisci. Odio aliquid est fuga beatae, dicta ut sint ipsa vero dolor accusamus accusantium reiciendis velit omnis voluptate, quo harum earum nemo! Sint voluptas accusantium modi porro placeat animi atque deserunt quam, quas inventore esse dolore, sequi dignissimos itaque praesentium aut autem velit cumque ea recusandae enim quod molestias unde quia? Reiciendis, blanditiis illo? Nihil earum optio tempore velit, ut libero laborum excepturi error exercitationem maiores non esse quaerat temporibus magni nesciunt dolore quis quibusdam harum deserunt, ea consectetur, inventore culpa. Perferendis saepe voluptatibus impedit, amet temporibus, placeat ullam deleniti nam, debitis quibusdam illo ratione? Modi similique earum sapiente officia odit, dolor nam consequatur, accusantium eos rem nobis ipsa velit tempore. Dolorem fugiat blanditiis illo nobis officia facilis omnis maxime itaque. Deleniti, exercitationem unde neque soluta voluptatem fuga temporibus, quidem dolorem ex impedit nihil. Eaque quam, dolores impedit earum facilis architecto perferendis magni nulla sapiente, necessitatibus a accusantium quod, optio similique commodi corporis aspernatur ipsa consequatur modi? Aut dolore quam deleniti ipsam quos cum unde, amet placeat dolores accusantium quas cupiditate voluptas et veniam quis aliquam nam hic ea corrupti, labore repudiandae voluptatibus. Voluptatum eligendi at corporis perferendis, quibusdam iure adipisci similique aut molestiae!</textarea>
+                </div>
+            </div>
+            <div id="player-div">
+                <div class="player-title">
+                    your text
+                </div>
+                <div class="paragraph">
+                    <textarea id="player-textarea" rows="3" spellcheck="false">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nemo reiciendis culpa debitis facere nobis explicabo magni cupiditate quis id repudiandae similique adipisci neque recusandae dolores ab consequatur hic magnam velit, quia modi, sed, impedit atque molestias? Voluptatem, corrupti illo at suscipit ullam, hic dignissimos maiores non iure facere totam ratione omnis explicabo voluptas deleniti similique officia alias nam aperiam id. Neque reprehenderit at voluptatibus mollitia unde voluptate eligendi ad, eveniet, cum, voluptas soluta! Quis corporis delectus, laudantium iure cupiditate earum tempore, veniam ullam consectetur exercitationem alias doloribus reiciendis magni laborum asperiores in. Sit, eos hic deserunt dignissimos officiis fugit culpa asperiores dolorem similique beatae deleniti unde veniam voluptatem minima, cupiditate modi maiores non natus ducimus illum eius tempora velit optio dolores. Voluptate, ipsam reprehenderit expedita delectus qui blanditiis eius dolorum mollitia est repellendus distinctio officia odio sunt a excepturi repudiandae modi quo pariatur aut asperiores, necessitatibus reiciendis possimus? Voluptas tempora odit, aliquid accusantium, officia voluptate, inventore rerum amet commodi vero consectetur dolorum minus enim neque fugiat. Exercitationem rem deserunt sunt corrupti vero quam ipsa ut error dignissimos numquam distinctio doloremque voluptatem dolor dicta quos, id hic nostrum reiciendis sit odio illum ducimus! Aperiam libero ratione vero harum, ex exercitationem unde deserunt dignissimos fugit sint debitis eius, molestiae dolor. Exercitationem est quisquam ipsum cupiditate! Dolore recusandae consequuntur mollitia quod saepe tempore amet, architecto dolor! Quis iure labore nam, exercitationem nostrum soluta, in ipsam ullam reiciendis quos quae. Expedita aspernatur sapiente, eius voluptates minima quia porro optio animi dolorum ducimus laboriosam saepe, eveniet error. Repudiandae eaque, ipsam libero quaerat animi facere incidunt maiores officia, quidem quod minus blanditiis ullam, maxime distinctio. Deleniti consequuntur sequi excepturi quia? Facere accusantium quasi hic odit! Vero aliquid quaerat cum, veritatis hic nesciunt voluptates consectetur laborum modi libero harum vel quod! Quam ullam ducimus dolorum libero laudantium.</textarea>
+                </div>
+            </div>
+            <!-- <div style="font-size: 72px; text-align: center; color: var(--text-color); width: 100%;">
+                multiplayer mode <i>coming soon</i>. pahinga muna ako 🤡.
+            </div> -->
             <!-- <div class="code-popup">
                 <div class="code-body">
                     <p>Send this link to your friend:</p>
