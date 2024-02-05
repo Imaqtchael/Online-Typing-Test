@@ -42,6 +42,7 @@ html {
     box-sizing: border-box;
     transition: border-color 200s ease-in-out;
     color: var(--header-color);
+    caret-color: var(--tertiary-color);
 }
 
 
