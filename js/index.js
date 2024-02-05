@@ -22,10 +22,8 @@ function fetchQuote() {
     });
 }
 
-let baseLink = "https://mjbarcenas.github.io/keybored";
-
 async function fetchRandom(words) {
-    let allText = await readTextFile(baseLink + "/easy_words.txt");
+    let allText = await readTextFile("easy_words.txt");
     let result = [];
     return new Promise(resolve => {
         for (let i = 0; i < words; i++) {
@@ -423,16 +421,21 @@ showTypingTestButton.addEventListener("click", showTypingTest);
 showHistoryButton.addEventListener("click", showHistory);
 showMultiplayerButton.addEventListener("click", showMultiplayer);
 
+let previousMode = "paragraph";
+
 let paragraphButton = document.querySelector("#paragraph");
 paragraphButton.addEventListener("click", () => {
+    previousMode = "paragraph";
     wordsCountButton.value = parseInt(paragraphButton.getAttribute('data-title'));
     generateQuote();
 });
 
 let randomButton = document.querySelector("#random");
 randomButton.addEventListener("click", () => {
-    paragraphButton.setAttribute('data-title', wordsCountButton.value);
-
+    if (previousMode == "paragraph") {
+        paragraphButton.setAttribute('data-title', wordsCountButton.value);
+    }
+    previousMode = "random";
     generateRandom();
 });
 
@@ -789,10 +792,10 @@ function readTextFile(file) {
     });
 }
 
+setWebIcon();
 let urlParams = new URLSearchParams(window.location.search);
 if (!urlParams.has("code")) {
     generateQuote();
-    setWebIcon();
     // showMultiplayer();
     // showHistory();
     // showLogsTest();

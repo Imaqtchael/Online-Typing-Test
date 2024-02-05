@@ -21,7 +21,7 @@ function initializeMultiplayer() {
 
 let alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 let num = "0123456789";
-let multiplayerBaseLink = baseLink + "?code=";
+let multiplayerBaseLink = "https://mjbarcenas.github.io/keybored?code=";
 
 function generateMultiplayerLink() {
     let code = "";
