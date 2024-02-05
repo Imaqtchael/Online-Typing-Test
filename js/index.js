@@ -5,6 +5,22 @@ function getRandomInteger(min, max) {
 let wordButton = document.querySelector("label[for='word']");
 let icon = wordButton.firstElementChild;
 
+function readTextFile(file) {
+    return new Promise((resolve) => {
+        var rawFile = new XMLHttpRequest();
+        rawFile.open("GET", file, false);
+        rawFile.onreadystatechange = function() {
+            if (rawFile.readyState === 4) {
+                if (rawFile.status === 200 || rawFile.status == 0) {
+                    var allText = document.location.protocol == "https" ? rawFile.responseText.split("\n") : rawFile.responseText.split("\r\n");
+                    resolve(allText);
+                }
+            }
+        }
+        rawFile.send();
+    });
+}
+
 function fetchQuote() {
     return new Promise((resolve, reject) => {
         $.ajax({
@@ -23,7 +39,7 @@ function fetchQuote() {
 }
 
 async function fetchRandom(words) {
-    let allText = await readTextFile("easy_words.txt");
+    let allText = await readTextFile("../easy_words.txt");
     let result = [];
     return new Promise(resolve => {
         for (let i = 0; i < words; i++) {
@@ -775,22 +791,6 @@ textarea.addEventListener("keydown", function(event) {
     handleUserInput(event.key);
     event.preventDefault();
 });
-
-function readTextFile(file) {
-    return new Promise((resolve) => {
-        var rawFile = new XMLHttpRequest();
-        rawFile.open("GET", file, false);
-        rawFile.onreadystatechange = function() {
-            if (rawFile.readyState === 4) {
-                if (rawFile.status === 200 || rawFile.status == 0) {
-                    var allText = rawFile.responseText.split("\r\n");
-                    resolve(allText);
-                }
-            }
-        }
-        rawFile.send();
-    });
-}
 
 setWebIcon();
 let urlParams = new URLSearchParams(window.location.search);
