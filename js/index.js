@@ -43,7 +43,17 @@ async function fetchRandom(words) {
     let result = [];
     return new Promise(resolve => {
         for (let i = 0; i < words; i++) {
-            result.push(allText[getRandomInteger(0, allText.length)].trim());
+            try {
+                let current = allText[getRandomInteger(0, allText.length)].trim();
+                if (current == "") {
+                    i--;
+                } else {
+                    result.push(current);
+                }
+            } catch (error) {
+                fetchRandom(words);
+                return;
+            }
         }
 
         resolve(result);
@@ -83,7 +93,7 @@ async function generateQuote() {
         initial.push(result);
     }
 
-    toBeTyped = initial.split(" ").trim().join(" ");
+    toBeTyped = initial.join(" ").trim();
     toBeTypedWordCount = toBeTyped.split(" ").length;
 
     let wordTotalSpan = document.querySelector("#word-total");
@@ -203,6 +213,7 @@ function generateNewTypingTest() {
     if (activeRadioButton.value == "paragraph") {
         generateQuote();
     } else {
+        validateMinRandomWords();
         generateRandom();
     }
 }
@@ -321,9 +332,7 @@ function updateLogChart() {
 }
 
 function validateMinRandomWords() {
-    let activeRadioButton = document.querySelector("input[name='mode']:checked");
-
-    if (activeRadioButton.value == "random" && wordsCountButton.value < 10) {
+    if (wordsCountButton.value < 10) {
         wordsCountButton.value = 10;
     }
 }
@@ -437,12 +446,13 @@ showTypingTestButton.addEventListener("click", showTypingTest);
 showHistoryButton.addEventListener("click", showHistory);
 showMultiplayerButton.addEventListener("click", showMultiplayer);
 
-let previousMode = "paragraph";
+let previousMode = "random";
 
 let paragraphButton = document.querySelector("#paragraph");
 paragraphButton.addEventListener("click", () => {
-    previousMode = "paragraph";
     wordsCountButton.value = parseInt(paragraphButton.getAttribute('data-title'));
+
+    previousMode = "paragraph";
     generateQuote();
 });
 
@@ -457,14 +467,7 @@ randomButton.addEventListener("click", () => {
 
 let wordsCountButton = document.querySelector("#words-input");
 wordsCountButton.addEventListener("keydown", (event) => {
-    validateMinRandomWords();
-
     if (event.key == "Enter" || event.key == "Return") {
-        let activeRadioButton = document.querySelector("input[name='mode']:checked");
-        if (activeRadioButton.value == "paragraph") {
-            paragraphButton.setAttribute("data-default", paragraphButton.value);
-        }
-
         generateNewTypingTest();
     }
 })
@@ -477,7 +480,7 @@ paragraph.addEventListener("click", () => {
 let nextButton = document.querySelector("#next-button");
 nextButton.addEventListener("keydown", event => {
     event.preventDefault();
-    if (event.key == "Enter") {
+    if (event.key == "Enter" || event.key == "Return") {
         generateNewTypingTest();
     } else if (event.key == "Tab") {
         restartButton.focus();
@@ -488,7 +491,7 @@ nextButton.addEventListener("click", generateNewTypingTest);
 let restartButton = document.querySelector("#restart-button");
 restartButton.addEventListener("keydown", event => {
     event.preventDefault();
-    if (event.key == "Enter") {
+    if (event.key == "Enter" || event.key == "Return") {
         resetTypingTest();
     } else if (event.key == "Tab") {
         nextButton.focus();
