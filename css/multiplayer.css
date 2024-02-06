@@ -26,20 +26,21 @@
     font-size: var(--text-size);
 }
 
-#code-link-input {
-    width: -webkit-fill-available;
-}
-
 #copy-link-button {
     cursor: pointer;
 }
 
-#countdown-timer,
-#winner-text-div {
+#battle-heading {
     width: 100%;
     font-size: var(--header-size);
     color: var(--tertiary-color);
     text-align: center;
+}
+
+#enemy-div,
+#player-div,
+#battle-paragraph-buttons {
+    /* display: none; */
 }
 
 #player-div>.player-title {
@@ -48,7 +49,20 @@
 
 .player-title {
     font-size: var(--medium-text);
-    text-align: center;
+    text-align: left;
+    margin-left: .5rem;
+}
+
+.player-title p:has(span#battle-self-wpm) {
+    color: var(--header-color);
+}
+
+.player-title #battle-self-wpm {
+    color: var(--tertiary-color);
+}
+
+.player-title #battle-enemy-wpm {
+    color: var(--wrong-color);
 }
 
 #multiplayer-loading {

@@ -110,16 +110,15 @@
         </div>
         <div id="multiplayer-body">
             <div class="code-link">
-                <input type="text" id="code-link-input" class="textbox-control" readonly>
+                <span>share this link: </span>
+                <input type="text" name="link-input" id="code-link-input" class="textbox-control" readonly>
                 <button id="copy-link-button" class="button-control">copy</button>
             </div>
-            <div id="countdown-timer">
-            </div>
-            <div id="winner-text-div">
+            <div id="battle-heading">
             </div>
             <div id="enemy-div">
                 <div class="player-title">
-                    enemy's text
+                    <p>challenger: <span id="battle-enemy-wpm"></span> wpm</p>
                 </div>
                 <div class="paragraph">
                     <textarea id="enemy-textarea" rows="3" spellcheck="false" disabled></textarea>
@@ -127,11 +126,14 @@
             </div>
             <div id="player-div">
                 <div class="player-title">
-                    your text
+                    <p>you: <span id="battle-self-wpm"></span> wpm</p>
                 </div>
                 <div class="paragraph">
                     <textarea id="player-textarea" rows="3" spellcheck="false" disabled></textarea>
                 </div>
+            </div>
+            <div id="battle-paragraph-buttons" class="paragraph-buttons">
+                <button id="battle-next-button"><i class="fa-solid fa-chevron-right"></i></button>
             </div>
             <!-- <div style="font-size: 72px; text-align: center; color: var(--text-color); width: 100%;">
                 multiplayer mode <i>coming soon</i>. pahinga muna ako 🤡.
