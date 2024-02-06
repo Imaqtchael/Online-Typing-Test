@@ -21,21 +21,45 @@ function readTextFile(file) {
     });
 }
 
-function fetchQuote() {
-    return new Promise((resolve, reject) => {
-        $.ajax({
-            method: 'GET',
-            url: 'https://api.api-ninjas.com/v1/quotes?',
-            headers: { 'X-Api-Key': 'pETqGO2l1uJeufMoO6942w==KtfqSvf1pA6zVgC8' },
-            contentType: 'application/json',
-            success: function(result) {
-                resolve(result[0].quote);
-            },
-            error: function ajaxError(jqXHR) {
-                reject(jqXHR.responseText);
+async function fetchQuote(quotes) {
+    let allText = await readTextFile("quotes.txt");
+    let result = [];
+    return new Promise(resolve => {
+        for (let i = 0; i < quotes; i++) {
+            try {
+                let current = allText[getRandomInteger(0, allText.length)].trim();
+                if (current == "") {
+                    i--;
+                } else {
+                    result.push(current);
+                }
+            } catch (error) {
+                fetchQuote(words);
+                return;
             }
-        });
+        }
+
+        resolve(result);
     });
+
+    // **************************************
+    // If you want to use an API then comment the code above and uncomment the code below
+    // **************************************
+
+    // return new Promise((resolve, reject) => {
+    //     $.ajax({
+    //         method: 'GET',
+    //         url: 'https://api.api-ninjas.com/v1/quotes?',
+    //         headers: { 'X-Api-Key': 'pETqGO2l1uJeufMoO6942w==KtfqSvf1pA6zVgC8' },
+    //         contentType: 'application/json',
+    //         success: function(result) {
+    //             resolve(result[0].quote);
+    //         },
+    //         error: function ajaxError(jqXHR) {
+    //             reject(jqXHR.responseText);
+    //         }
+    //     });
+    // });
 }
 
 async function fetchRandom(words) {
@@ -57,7 +81,7 @@ async function fetchRandom(words) {
         }
 
         resolve(result);
-    })
+    });
 
     // **************************************
     // If you want to use an API then comment the code above and uncomment the code below
@@ -87,13 +111,9 @@ async function generateQuote() {
     wordButton.insertBefore(icon, wordButton.firstChild);
 
     let words = document.querySelector("#words-input").value;
-    let initial = [];
-    for (let i = 0; i < words; i++) {
-        let result = await fetchQuote();
-        initial.push(result);
-    }
 
-    toBeTyped = initial.join(" ").trim();
+    toBeTyped = await (fetchQuote(words))
+    toBeTyped = toBeTyped.join(" ").trim();
     toBeTypedWordCount = toBeTyped.split(" ").length;
 
     let wordTotalSpan = document.querySelector("#word-total");
@@ -191,22 +211,6 @@ function showHistory() {
     multiplayerBody.style.display = "none";
 }
 
-function showMultiplayer() {
-    // generateMultiplayerLink();
-    // createFirebaseMultiplayerEntry(multiplayerEntry);
-
-    if (activeNavButton) {
-        activeNavButton.classList.remove("active");
-    }
-
-    activeNavButton = showMultiplayerButton;
-    activeNavButton.classList.add("active");
-
-    multiplayerBody.style.display = "flex";
-    typingTestBody.style.display = "none";
-    historyBody.style.display = "none";
-}
-
 function generateNewTypingTest() {
     blurTyping();
     let activeRadioButton = document.querySelector("input[name='mode']:checked");
@@ -267,20 +271,19 @@ function resetTypingTest() {
     stopTimer();
     wordCount.textContent = 0;
     textarea.style.caretColor = "var(--tertiary-color)";
-    textarea.previousSibling.innerHTML = "";
 
     textarea.selectionEnd = 0;
     textarea.selectionStart = 0;
 
     $("textarea").highlightWithinTextarea({
         highlight: [{
-            highlight: correctInput > 0 ? [0, correctInput] : null,
+            highlight: null,
             className: "correct"
         }, {
-            highlight: wrongInput > 0 ? [correctInput, correctInput + wrongInput] : null,
+            highlight: null,
             className: "wrong"
         }, {
-            highlight: [correctInput + wrongInput, toBeTyped.length],
+            highlight: null,
             className: "default"
         }]
     });
@@ -438,7 +441,7 @@ function toggleTheme() {
 let toggleThemeButton = document.querySelector("#theme");
 let showTypingTestButton = document.querySelector("#typing-test");
 let showHistoryButton = document.querySelector("#history");
-let showMultiplayerButton = document.querySelector("#multiplayer");
+
 let typingTestBody = document.querySelector("#body");
 let historyBody = document.querySelector("#history-body");
 let multiplayerBody = document.querySelector("#multiplayer-body");
@@ -447,7 +450,7 @@ toggleThemeButton.addEventListener("click", toggleTheme);
 
 showTypingTestButton.addEventListener("click", showTypingTest);
 showHistoryButton.addEventListener("click", showHistory);
-showMultiplayerButton.addEventListener("click", showMultiplayer);
+
 
 let previousMode = "random";
 
@@ -809,7 +812,7 @@ setWebIcon();
 let urlParams = new URLSearchParams(window.location.search);
 if (!urlParams.has("code")) {
     generateRandom();
-    showMultiplayer();
+    // showMultiplayer();
     // showHistory();
     // showLogsTest();
 }
