@@ -66,6 +66,10 @@
     color: var(--header-color);
 }
 
+.hwt-content mark.enemy {
+    color: var(--tertiary-color);
+}
+
 .hwt-content mark.default {
     color: var(--text-color);
 }

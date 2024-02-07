@@ -20,7 +20,6 @@ async function refreshFirebaseMultiplayerEntry() {
         timer: 10,
         winner: "none",
         player1: {
-            present: true,
             finished: false,
             wrongInput: 0,
             correctInput: 0,
@@ -29,7 +28,6 @@ async function refreshFirebaseMultiplayerEntry() {
             willNext: false
         },
         player2: {
-            present: true,
             finished: false,
             wrongInput: 0,
             correctInput: 0,
@@ -40,9 +38,7 @@ async function refreshFirebaseMultiplayerEntry() {
 
     }
 
-    update(ref(database), {
-        [bucketKey]: gameDetails
-    });
+    update(ref(database, bucketKey), gameDetails);
 }
 
 
@@ -53,26 +49,34 @@ async function initializeMultiplayer() {
         await createNewBattleText();
         createFirebaseMultiplayerEntry();
     } else {
-        let dbSnapshot = await get(query(ref(dabatase, bucketKey)));
-        if (self == "player1") {
-            refreshFirebaseMultiplayerEntry();
+        let dbSnapshot = await get(ref(database, bucketKey));
+        if (dbSnapshot.exists()) {
+            await refreshFirebaseMultiplayerEntry();
         }
+        // Create an else condittion checking if you are the creator of the game
+        // Might be implemented by generating a unique code in your machine and
+        // using it as the creator key in your gameDetails
     }
 }
 
 async function createNewBattleText() {
-    let length = getRandomInteger(20, 30);
-    battle_toBeTyped = await fetchRandom(length);
+    let isRandom = getRandomInteger(0, 1) == 0;
+    if (isRandom) {
+        let length = getRandomInteger(20, 30);
+        battle_toBeTyped = await fetchRandom(length);
+    } else {
+        battle_toBeTyped = await fetchQuote(1);
+    }
     battle_toBeTyped = battle_toBeTyped.join(" ");
 }
 
 function cleanBattleTextarea() {
-    player1TextArea.style.caretColor = "var(--tertiary-color)";
+    battleTextArea.style.caretColor = "var(--tertiary-color)";
 
-    player1TextArea.selectionEnd = 0;
-    player1TextArea.selectionStart = 0;
+    battleTextArea.selectionEnd = 0;
+    battleTextArea.selectionStart = 0;
 
-    $("#player-textarea").highlightWithinTextarea({
+    $("#battle-textarea").highlightWithinTextarea({
         highlight: [{
             highlight: null,
             className: "correct"
@@ -81,30 +85,20 @@ function cleanBattleTextarea() {
             className: "wrong"
         }, {
             highlight: null,
-            className: "default"
-        }]
-    });
-    $("#enemy-textarea").highlightWithinTextarea({
-        highlight: [{
-            highlight: null,
-            className: "correct"
-        }, {
-            highlight: null,
-            className: "wrong"
-        }, {
-            highlight: null,
-            className: "default"
+            className: "enemy"
         }]
     });
 }
 
-// let multiplayerBaseLink = "https://mjbarcenas.github.io/keybored?code=";
-let multiplayerBaseLink = "192.168.1.3:5501?code=";
-let player1TextArea = document.querySelector("#player-textarea");
-let player2TextArea = document.querySelector("#enemy-textarea");
+let multiplayerBaseLink = window.navigator.onLine * 0 ? "https://mjbarcenas.github.io/keybored?code=" : "192.168.1.3:5501?code=";
+let battleTextArea = document.querySelector("#battle-textarea");
 let codeLink = document.querySelector(".code-link");
+let battleTypedWordCount = document.querySelector("#battle-typed-word");
+let battleTotalWordCount = document.querySelector("#battle-word-total");
+let battleEnemyScoreSpan = document.querySelector("#battle-enemy-score");
+let battleSelfScoreSpan = document.querySelector("#battle-self-score");
 let countDownTimer;
-let countDown = 10;
+let countDown = 5;
 
 let showMultiplayerButton = document.querySelector("#multiplayer");
 showMultiplayerButton.addEventListener("click", () => {
@@ -127,6 +121,7 @@ function showMultiplayer() {
 localStorage.removeItem("code");
 
 function startCountdownTimer() {
+    battleHeading.style.color = "var(--header-color)"
     countDownTimer = setInterval(() => {
         countDown -= 1;
         if (self == "player1") {
@@ -140,8 +135,8 @@ function stopCountdownTimer() {
 }
 
 function setMultiplayerText(text) {
-    player1TextArea.value = text;
-    player2TextArea.value = text;
+    battleTotalWordCount.textContent = text.split(" ").length;
+    battleTextArea.value = text;
 }
 
 async function createFirebaseMultiplayerEntry() {
@@ -152,8 +147,11 @@ async function createFirebaseMultiplayerEntry() {
         gameFinish: false,
         timer: 10,
         winner: "none",
+        player1Score: 0,
+        player1Present: true,
+        player2Score: 0,
+        player2Present: false,
         player1: {
-            present: true,
             finished: false,
             wrongInput: 0,
             correctInput: 0,
@@ -162,7 +160,6 @@ async function createFirebaseMultiplayerEntry() {
             willNext: false
         },
         player2: {
-            present: false,
             finished: false,
             wrongInput: 0,
             correctInput: 0,
@@ -180,16 +177,15 @@ async function createFirebaseMultiplayerEntry() {
 }
 
 let battlePlayerDiv = document.querySelector("#player-div");
-let battleEnemyDiv = document.querySelector("#enemy-div");
 let battleParagraphButtons = document.querySelector("#battle-paragraph-buttons");
 let enemyWPMSpan = document.querySelector("#battle-enemy-wpm");
 let selfWPMSpan = document.querySelector("#battle-self-wpm");
+let battleHeading = document.querySelector("#battle-heading");
 
 function handleOnValue() {
-    let battleHeading = document.querySelector("#battle-heading");
-
     onValue(ref(database, bucketKey), (snapshot) => {
         let tree = snapshot.val();
+        let bothPlayerPresent = tree.player1Present && tree.player2Present;
         let player1 = tree.player1;
         let player2 = tree.player2;
         let battle_gameReady = tree.gameReady;
@@ -199,31 +195,32 @@ function handleOnValue() {
         let battle_timer = tree.timer;
         let battle_winner = tree.winner;
 
-        if (player1.present && player2.present && !battle_gameReady) {
+        if (bothPlayerPresent && !battle_gameReady) {
             stopBattle();
             cleanBattleTextarea();
+            focusBattleTyping();
 
             update(ref(database, bucketKey), { gameReady: true });
-            codeLink.style.display = "none";
+            codeLink.style.visibility = "hidden";
             battlePlayerDiv.style.display = "block";
-            battleEnemyDiv.style.display = "block";
             startCountdownTimer();
 
             battle_toBeTyped = battle_text;
             setMultiplayerText(battle_text);
-            player1TextArea.setAttribute("set", "");
+            battleTextArea.setAttribute("set", "");
         } else if (battle_gameReady && battle_timer >= 0 && !battle_gameStarted) {
             if (battle_timer > 0) {
                 battleHeading.textContent = battle_timer;
-            } else if (battle_timer >= 0 && self) {
+            } else if (battle_timer >= 0) {
                 update(ref(database, bucketKey), { gameStarted: true });
                 battle_startTimer();
-                battleHeading.textContent = "go!";
-                player1TextArea.disabled = false;
-                player1TextArea.setSelectionRange(0, 0);
-                player1TextArea.blur();
-                player1TextArea.focus();
                 stopCountdownTimer();
+                battleHeading.style.color = "var(--tertiary-color)";
+                battleHeading.textContent = "go!";
+                battleTextArea.disabled = false;
+                battleTextArea.setSelectionRange(0, 0);
+                battleTextArea.blur();
+                battleTextArea.focus();
                 setTimeout(() => {
                     battleHeading.style.visibility = "hidden";
                 }, 1000);
@@ -234,26 +231,31 @@ function handleOnValue() {
             };
             if (player1.finished && !player2.finished) {
                 updates["winner"] = "player1";
+                updates["player1Score"] = tree.player1Score += 1;
             } else if (!player1.finished && player2.finished) {
                 updates["winner"] = 'player2';
+                updates["player2Score"] = tree.player2Score += 1;
             } else if (player1.finished && player2.finished) {
                 updates["winner"] = 'draw';
             }
             update(ref(database, bucketKey), updates);
-            player1TextArea.removeAttribute("set");
+            battleTextArea.removeAttribute("set");
         } else if (battle_winner != "none") {
             if (battle_winner == "draw") {
                 battleHeading.textContent = "draw!";
                 battleHeading.style.color = "var(--header-color)";
             } else if (battle_winner == self) {
                 battleHeading.textContent = "you win!";
+                battleSelfScoreSpan.textContent = tree.player1Score;
                 battleHeading.style.color = "var(--tertiary-color)";
             } else if (battle_winner != self) {
                 battleHeading.textContent = "you lose!";
+                battleEnemyScoreSpan.textContent = tree.player1Score;
                 battleHeading.style.color = "var(--wrong-color)";
             }
 
             battleHeading.style.visibility = "visible";
+            battleTextArea.disabled = true;
         }
 
         if (player1.willNext || player2.willNext) {
@@ -272,21 +274,28 @@ function handleOnValue() {
 
         let enemy = self == "player1" ? player2 : player1;
         if ((battle_gameReady && battle_gameStarted && !battle_gameFinish) && (enemy.correctInput > 0 || enemy.wrongInput > 0)) {
-            let enemyCorrectInput = enemy.correctInput;
-            let enemyWrongInput = enemy.wrongInput;
+            battle_enemyCorrectInput = enemy.correctInput;
             let enemyWPM = enemy.wpm;
-            $("#" + player2TextArea.id).highlightWithinTextarea({
-                highlight: [{
-                    highlight: enemyCorrectInput > 0 ? [0, enemyCorrectInput] : null,
-                    className: "correct"
-                }, {
-                    highlight: enemyWrongInput > 0 ? [enemyCorrectInput, enemyCorrectInput + enemyWrongInput] : null,
-                    className: "wrong"
-                }, {
-                    highlight: [enemyCorrectInput + enemyWrongInput, battle_toBeTyped.length],
-                    className: "default"
-                }]
+
+            highlighted = [highlighted[0], highlighted[1], {
+                highlight: battle_enemyCorrectInput > battle_correctInput + battle_wrongInput ? [battle_correctInput + battle_wrongInput, battle_enemyCorrectInput] : null,
+                className: "enemy"
+            }];
+
+            $("#battle-textarea").highlightWithinTextarea({
+                highlight: highlighted
             });
+
+            let cursorPosition = battle_userInput.length;
+            battleTextArea.setSelectionRange(cursorPosition, cursorPosition);
+
+            if (battle_toBeTyped.length - battle_userInput.length <= 40) {
+                battleTextArea.scrollTop = battleTextArea.scrollHeight;
+                battleTextArea.focus();
+            } else {
+                battleTextArea.blur();
+                battleTextArea.focus();
+            }
 
             enemyWPMSpan.textContent = enemyWPM;
         }
@@ -322,47 +331,71 @@ function copyMultiplayerLink() {
 }
 
 function stopBattle() {
+    blurBattleTyping();
+
+    battle_typingFocused = false;
     battle_userInput = "";
     battle_toBeTyped = "";
     battle_input = 0;
     battle_correctInput = 0;
+    battle_enemyCorrectInput = 0;
     battle_wrongInput = 0;
     battle_totalWrongInput = 0;
     battle_typingFinished = false;
     battle_secondsPassed = 0;
-    countDown = 10;
+    battleLastTypedLength = 0;
+    countDown = 5;
+    highlighted = [{
+        highlight: null,
+        className: "correct"
+    }, {
+        highlight: null,
+        className: "wrong"
+    }, {
+        highlight: null,
+        className: "enemy"
+    }];
     battle_stopTimer();
     stopCountdownTimer();
-    player1TextArea.disabled = true;
+    battleTextArea.disabled = true;
     selfWPMSpan.textContent = 0;
     enemyWPMSpan.textContent = 0;
+    battleTypedWordCount.textContent = 0;
 }
 
-function battle_startTimer() {
-    battle_secondsPassedCounter = setInterval(() => {
-        battle_secondsPassed += 1;
+function manageBattleTest() {
+    let wpm = Math.floor((battle_correctInput / 5) * (60 / battle_secondsPassed));
+    let accuracy = battle_totalWrongInput == 0 ? 100 : Math.floor(((battle_correctInput - battle_totalWrongInput) / battle_toBeTyped.length) * 100);
 
-        if (battle_secondsPassed > 200 && self == "player1") {
-            stopBattle();
-            refreshFirebaseMultiplayerEntry();
-        }
-
-        if (battle_input == 0) {
-            return;
-        }
-
-        let wpm = Math.floor((battle_correctInput / 5) * (60 / battle_secondsPassed));
-        let accuracy = battle_totalWrongInput == 0 ? 100 : Math.floor(((battle_correctInput - battle_totalWrongInput) / battle_toBeTyped.length) * 100);
-
+    if (wpm != Infinity) {
         update(ref(database, bucketKey + "/" + self), {
             wpm: wpm,
             accuracy: accuracy,
             correctInput: battle_correctInput,
             wrongInput: battle_wrongInput
         });
+    }
 
-        selfWPMSpan.textContent = wpm;
+    selfWPMSpan.textContent = wpm;
+}
 
+let battleLastTypedLength = 0;
+
+function battle_startTimer() {
+    battle_secondsPassedCounter = setInterval(() => {
+        battle_secondsPassed += 1;
+
+        if (battle_secondsPassed > 200) {
+            stopBattle();
+            goHome();
+        }
+
+        if (battleLastTypedLength == battle_input) {
+            blurBattleTyping();
+        } else {
+            battleLastTypedLength = battle_input;
+            manageBattleTest();
+        }
     }, 1000);
 }
 
@@ -370,20 +403,56 @@ function battle_stopTimer() {
     clearInterval(battle_secondsPassedCounter);
 }
 
+function blurBattleTyping() {
+    battle_typingFocused = false;
+
+    navButtons.style.visibility = "visible";
+    codeLink.style.visibility = self == "player1" ? "visible" : "hidden";
+    battleParagraphButtons.style.visibility = "visible";
+}
+
+function focusBattleTyping() {
+    battle_typingFocused = false;
+
+    navButtons.style.visibility = "hidden";
+    codeLink.style.visibility = "hidden";
+    battleParagraphButtons.style.visibility = "hidden";
+}
+
+let battle_typingFocused = false
 let battle_userInput = "";
 let battle_toBeTyped = "";
 let battle_input = 0;
 let battle_correctInput = 0;
+let battle_enemyCorrectInput = 0;
 let battle_wrongInput = 0;
 let battle_totalWrongInput = 0;
 let battle_typingFinished = false;
 let battle_secondsPassed = 0;
 let battle_secondsPassedCounter;
+let highlighted = [{
+    highlight: null,
+    className: "correct"
+}, {
+    highlight: null,
+    className: "wrong"
+}, {
+    highlight: [6, 16],
+    className: "enemy"
+}, {
+    highlight: null,
+    className: "default"
+}];
 
 function handleMultiplayerBattle(uInput) {
     if ((battle_userInput.length == battle_toBeTyped.length && !battle_typingFinished && uInput != "Backspace") || battle_typingFinished || !/^[a-zA-Z0-9\!\@\#\$\%\^\&\*\(\)\_\-\+\=\{\[\}\]\|\\\:\;\"\'\<\,\>\.\?\/ ]$/.test(uInput) && uInput != "Backspace") {
         return;
     }
+
+    if (!battle_typingFocused) {
+        focusBattleTyping();
+    }
+
     battle_input += 1;
 
     if (uInput == "Backspace") {
@@ -396,7 +465,7 @@ function handleMultiplayerBattle(uInput) {
             battle_wrongInput -= 1;
 
             if (battle_wrongInput == 0) {
-                player1TextArea.style.caretColor = "var(--tertiary-color)";
+                battleTextArea.style.caretColor = "var(--tertiary-color)";
             }
         } else {
             battle_correctInput -= 1;
@@ -405,32 +474,40 @@ function handleMultiplayerBattle(uInput) {
         battle_userInput += uInput;
         if (battle_userInput[battle_userInput.length - 1] == battle_toBeTyped[battle_userInput.length - 1] && battle_wrongInput == 0) {
             battle_correctInput += 1;
-            player1TextArea.style.caretColor = "var(--tertiary-color)";
+            battleTextArea.style.caretColor = "var(--tertiary-color)";
         } else {
             battle_wrongInput += 1;
             battle_totalWrongInput += 1;
-            player1TextArea.style.caretColor = "var(--wrong-color)";
+            battleTextArea.style.caretColor = "var(--wrong-color)";
         }
-
     }
 
     let cursorPosition = battle_userInput.length;
-    player1TextArea.setSelectionRange(cursorPosition, cursorPosition);
-
-    $("#" + player1TextArea.id).highlightWithinTextarea({
-        highlight: [{
+    battleTextArea.setSelectionRange(cursorPosition, cursorPosition);
+    highlighted = [{
             highlight: battle_correctInput > 0 ? [0, battle_correctInput] : null,
             className: "correct"
-        }, {
+        },
+        {
             highlight: battle_wrongInput > 0 ? [battle_correctInput, battle_correctInput + battle_wrongInput] : null,
             className: "wrong"
-        }, {
-            highlight: [battle_correctInput + battle_wrongInput, battle_toBeTyped.length],
-            className: "default"
-        }]
+        },
+        {
+            highlight: battle_enemyCorrectInput > battle_correctInput + battle_wrongInput ? [battle_correctInput + battle_wrongInput, battle_enemyCorrectInput] : null,
+            className: "enemy"
+        }
+    ];
+
+    $("#battle-textarea").highlightWithinTextarea({
+        highlight: highlighted
     });
 
+
+    manageBattleTest();
+
+
     if (battle_userInput == battle_toBeTyped) {
+        blurBattleTyping();
         battle_typingFinished = true;
         battle_stopTimer();
 
@@ -446,15 +523,19 @@ function handleMultiplayerBattle(uInput) {
             correctInput: battle_correctInput,
             finished: true
         });
-        player1TextArea.disabled = true;
+        battleTextArea.disabled = true;
     }
 
+    let typedWords = battle_userInput.slice(0, battle_correctInput).trim().split(" ").length;
+    battleTypedWordCount.textContent = typedWords;
+
+
     if (battle_toBeTyped.length - battle_userInput.length <= 40) {
-        player1TextArea.scrollTop = player1TextArea.scrollHeight;
-        player1TextArea.focus();
+        battleTextArea.scrollTop = battleTextArea.scrollHeight;
+        battleTextArea.focus();
     } else {
-        player1TextArea.blur();
-        player1TextArea.focus();
+        battleTextArea.blur();
+        battleTextArea.focus();
     }
 }
 
@@ -478,36 +559,37 @@ html.addEventListener("mousedown", event => {
     if (event.target != linkInput && linkInput.selectionEnd > 1) {
         linkInput.setSelectionRange(0, 0);
     } else if (event.target == document.querySelector("mark")) {
-        player1TextArea.focus();
+        battleTextArea.focus();
     }
 });
 
 let battleParagraph = document.querySelector("#player-div");
 battleParagraph.addEventListener("click", () => {
-    player1TextArea.focus();
+    battleTextArea.focus();
 });
 
-player1TextArea.addEventListener("mousedown", function(event) {
+battleTextArea.addEventListener("mousedown", function(event) {
     event.preventDefault();
 });
-player1TextArea.addEventListener("contextmenu", function(event) {
+battleTextArea.addEventListener("contextmenu", function(event) {
     event.preventDefault();
 });
-player1TextArea.addEventListener("keypress", function(event) {
+battleTextArea.addEventListener("keypress", function(event) {
     event.preventDefault();
 });
-player1TextArea.addEventListener("keyup", function(event) {
+battleTextArea.addEventListener("keyup", function(event) {
     event.preventDefault();
 });
-player1TextArea.addEventListener("input", function(event) {
-    player1TextArea.value = battle_toBeTyped;
+battleTextArea.addEventListener("input", function(event) {
+    event.preventDefault();
+    battleTextArea.value = battle_toBeTyped;
     handleMultiplayerBattle(event.inputType == "deleteContentBackward" ? "Backspace" : event.data);
-    event.preventDefault();
 });
-player1TextArea.addEventListener("keydown", function(event) {
-    if (event.key == "Unidentified" && player1TextArea.disabled) return;
-    handleMultiplayerBattle(event.key);
+battleTextArea.addEventListener("keydown", function(event) {
     event.preventDefault();
+    console.log(battleTextArea.disabled);
+    if (event.key == "Unidentified") return;
+    handleMultiplayerBattle(event.key);
 });
 
 if (urlParams.has("code")) {
@@ -517,11 +599,12 @@ if (urlParams.has("code")) {
     console.log(dbSnapshot.val()); // <-- Gives the value of the whole tree
     if (!dbSnapshot.exists() || dbSnapshot.val().gameFinish) {
         alert("Game does not exists or is finished");
-        generateRandom();
-        showTypingTest();
+        goHome();
     } else {
         showMultiplayer();
-        update(ref(database, bucketKey + "/" + self), { present: true });
+        update(ref(database, bucketKey), {
+            [self + "Present"]: true
+        });
         handleOnValue();
     }
 }

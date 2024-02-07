@@ -53,8 +53,19 @@ html {
     border: none;
     border-radius: 5px;
     padding: .5rem 1rem;
+    background-color: var(--secondary-color);
+    color: var(--header-color);
+}
+
+.button-control:hover {
+    background-color: var(--header-color);
+    color: var(--secondary-color);
+}
+
+.button-control:active {
     background-color: var(--tertiary-color);
-    color: var(--primary-color);
+    color: var(--secondary-color);
+    opacity: .9;
 }
 
 
@@ -535,8 +546,8 @@ footer {
 /* Class for elements that will show/hide when typing */
 
 .focusable {
-    transition-timing-function: ease-in;
-    transition: 0.2s;
+    transition-timing-function: ease-out;
+    transition: visibility 0.2s;
 }
 
 

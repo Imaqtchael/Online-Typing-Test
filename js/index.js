@@ -20,6 +20,13 @@ function readTextFile(file) {
         rawFile.send();
     });
 }
+let multiplayerButton = document.querySelector("button#multiplayer");
+
+if (window.navigator.onLine) {
+    multiplayerButton.style.display = "inline-block";
+} else {
+    multiplayerButton.style.display = "none";
+}
 
 async function fetchQuote(quotes) {
     let allText = await readTextFile("quotes.txt");
@@ -190,6 +197,10 @@ function showTypingTest() {
     typingTestBody.style.display = "flex";
     historyBody.style.display = "none";
     multiplayerBody.style.display = "none";
+
+    if (toBeTyped == "") {
+        generateNewTypingTest();
+    }
 
     if (textarea.offsetParent == null) {
         nextButton.focus();
@@ -436,6 +447,12 @@ function toggleTheme() {
         isDarkMode = true;
         toggleDarkMode();
     }
+}
+
+function goHome() {
+    let winLocation = window.location.toString();
+    let newLocation = winLocation.slice(0, winLocation.indexOf("?"));
+    window.location.replace(newLocation);
 }
 
 let toggleThemeButton = document.querySelector("#theme");
@@ -739,7 +756,6 @@ function handleUserInput(uInput) {
         typingFinished = true;
         startedTyping = false;
         stopTimer();
-        wordCount.textContent = userInput.split(" ").length;
 
         let accuracy = totalWrongInput == 0 ? 100 : Math.floor(((toBeTyped.length - totalWrongInput) / toBeTyped.length) * 100);
         let wpm = Math.floor((toBeTyped.length / 5) * (60 / secondsPassed));
@@ -771,10 +787,11 @@ function handleUserInput(uInput) {
         updateLogChart();
 
         showWPMAccuracy();
-    } else {
-        let typedWords = userInput.split(" ").length - 1;
-        wordCount.textContent = typedWords;
     }
+
+    let typedWords = userInput.slice(0, correctInput).trim().split(" ").length;
+    wordCount.textContent = typedWords;
+
 
     if (toBeTyped.length - userInput.length <= 40) {
         textarea.scrollTop = textarea.scrollHeight;
@@ -803,7 +820,7 @@ textarea.addEventListener("input", function(event) {
     event.preventDefault();
 });
 textarea.addEventListener("keydown", function(event) {
-    if (event.key == "Unidentified") return;
+    if (event.key == "Unidentified" || textarea.disabled) return;
     handleUserInput(event.key);
     event.preventDefault();
 });
