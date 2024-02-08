@@ -20,12 +20,15 @@ function readTextFile(file) {
         rawFile.send();
     });
 }
-let multiplayerButton = document.querySelector("button#multiplayer");
 
-if (window.navigator.onLine) {
-    multiplayerButton.style.display = "inline-block";
-} else {
-    multiplayerButton.style.display = "none";
+function hideMultiplayerIfOnline() {
+    let multiplayerButton = document.querySelector("button#multiplayer");
+
+    if (window.navigator.onLine) {
+        multiplayerButton.style.display = "inline-block";
+    } else {
+        multiplayerButton.style.display = "none";
+    }
 }
 
 async function fetchQuote(quotes) {
@@ -33,17 +36,8 @@ async function fetchQuote(quotes) {
     let result = [];
     return new Promise(resolve => {
         for (let i = 0; i < quotes; i++) {
-            try {
-                let current = allText[getRandomInteger(0, allText.length)].trim();
-                if (current == "") {
-                    i--;
-                } else {
-                    result.push(current);
-                }
-            } catch (error) {
-                fetchQuote(words);
-                return;
-            }
+            let current = allText[getRandomInteger(0, allText.length)].trim();
+            result.push(current);
         }
 
         resolve(result);
@@ -57,7 +51,7 @@ async function fetchQuote(quotes) {
     //     $.ajax({
     //         method: 'GET',
     //         url: 'https://api.api-ninjas.com/v1/quotes?',
-    //         headers: { 'X-Api-Key': 'pETqGO2l1uJeufMoO6942w==KtfqSvf1pA6zVgC8' },
+    //         headers: { 'X-Api-Key': '<YOUR API HERE>' },
     //         contentType: 'application/json',
     //         success: function(result) {
     //             resolve(result[0].quote);
@@ -74,17 +68,8 @@ async function fetchRandom(words) {
     let result = [];
     return new Promise(resolve => {
         for (let i = 0; i < words; i++) {
-            try {
-                let current = allText[getRandomInteger(0, allText.length)].trim();
-                if (current == "") {
-                    i--;
-                } else {
-                    result.push(current);
-                }
-            } catch (error) {
-                fetchRandom(words);
-                return;
-            }
+            let current = allText[getRandomInteger(0, allText.length)].trim();
+            result.push(current);
         }
 
         resolve(result);
@@ -279,6 +264,9 @@ function resetTypingTest() {
     currentRawWPM.length = 0;
     currentTimeStamps.length = 0;
     currentMistakes.length = 0;
+    correctInputIndex.length = 0;
+    wrongInputIndex.length = 0;
+    typedType.length = 0;
     stopTimer();
     wordCount.textContent = 0;
     textarea.style.caretColor = "var(--tertiary-color)";
@@ -538,6 +526,8 @@ let input = 0;
 let correctInput = 0;
 let wrongInput = 0;
 let totalWrongInput = 0;
+let correctInputIndex = [];
+let wrongInputIndex = [];
 let accuracyList = [];
 let wpmList = [];
 let logTries = [];
@@ -545,6 +535,7 @@ let currentWPM = [];
 let currentRawWPM = [];
 let currentTimeStamps = [];
 let currentMistakes = [];
+let typedType = [];
 // let currentRawWPM = [70, 86, 90];
 // let currentWPM = [60, 76, 80];
 // let currentMistakes = [{ x: 2, y: 3 }]
@@ -706,6 +697,13 @@ function handleUserInput(uInput) {
         }
         userInput = userInput.slice(0, -1);
 
+        if (typedType[typedType.length - 1] == "correct") {
+            correctInputIndex.pop();
+        } else if (typedType[typedType.length - 1] == "wrong") {
+            wrongInputIndex.pop();
+        }
+        typedType.pop();
+
         if (wrongInput > 0) {
             wrongInput -= 1;
 
@@ -717,10 +715,15 @@ function handleUserInput(uInput) {
         }
     } else {
         userInput += uInput;
-        if (userInput[userInput.length - 1] == toBeTyped[userInput.length - 1] && wrongInput == 0) {
+
+        if (userInput[userInput.length - 1] == toBeTyped[userInput.length - 1]) {
+            correctInputIndex.push([userInput.length - 1, userInput.length]);
+            typedType.push("correct");
             correctInput += 1;
             textarea.style.caretColor = "var(--tertiary-color)";
         } else {
+            wrongInputIndex.push([userInput.length - 1, userInput.length]);
+            typedType.push("wrong");
             wrongInput += 1;
             totalWrongInput += 1;
             textarea.style.caretColor = "var(--wrong-color)";
@@ -740,25 +743,22 @@ function handleUserInput(uInput) {
 
     $("#single-player-textarea").highlightWithinTextarea({
         highlight: [{
-            highlight: correctInput > 0 ? [0, correctInput] : null,
+            highlight: correctInputIndex,
             className: "correct"
         }, {
-            highlight: wrongInput > 0 ? [correctInput, correctInput + wrongInput] : null,
+            highlight: wrongInputIndex,
             className: "wrong"
-        }, {
-            highlight: [correctInput + wrongInput, toBeTyped.length],
-            className: "default"
         }]
     })
 
-    if (userInput == toBeTyped) {
+    if (userInput.length == toBeTyped.length) {
         blurTyping();
         typingFinished = true;
         startedTyping = false;
         stopTimer();
 
         let accuracy = totalWrongInput == 0 ? 100 : Math.floor(((toBeTyped.length - totalWrongInput) / toBeTyped.length) * 100);
-        let wpm = Math.floor((toBeTyped.length / 5) * (60 / secondsPassed));
+        let wpm = Math.floor((correctInput / 5) * (60 / secondsPassed));
         let raw = Math.floor((input / 5) * (60 / secondsPassed))
 
         accuracyText.textContent = accuracy;
@@ -826,6 +826,7 @@ textarea.addEventListener("keydown", function(event) {
 });
 
 setWebIcon();
+hideMultiplayerIfOnline();
 let urlParams = new URLSearchParams(window.location.search);
 if (!urlParams.has("code")) {
     generateRandom();
