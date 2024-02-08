@@ -9,7 +9,7 @@ const app = initializeApp(firebaseSettings);
 const database = getDatabase(app);
 let bucketKey, self;
 
-let multiplayerBaseLink = window.navigator.onLine * 0 ? "https://mjbarcenas.github.io/keybored?code=" : "192.168.1.3:5501?code=";
+let multiplayerBaseLink = window.location.toString().indexOf("192") != -1 ? "https://mjbarcenas.github.io/keybored?code=" : "192.168.1.3:5501?code=";
 let battleTextArea = document.querySelector("#battle-textarea");
 let codeLink = document.querySelector(".code-link");
 let battleTypedWordCount = document.querySelector("#battle-typed-word");
@@ -130,16 +130,14 @@ async function createFirebaseMultiplayerEntry() {
             wrongInput: 0,
             correctInput: 0,
             wpm: 0,
-            accuracy: 0,
-            willNext: false
+            accuracy: 0
         },
         player2: {
             finished: false,
             wrongInput: 0,
             correctInput: 0,
             wpm: 0,
-            accuracy: 0,
-            willNext: false
+            accuracy: 0
         }
 
     }
@@ -178,66 +176,6 @@ async function refreshFirebaseMultiplayerEntry() {
     }
 
     update(ref(database, bucketKey), gameDetails);
-}
-
-let notificationCenter = document.querySelector(".notification-center");
-
-function showMessage(title, message) {
-    let notificationMessage = document.createElement("div");
-    notificationMessage.className = "notification-message";
-
-    let notificationMessageContent = document.createElement("div");
-    notificationMessageContent.className = "message";
-
-    let notificationIcon = document.createElement("i");
-    notificationIcon.className = "fa-solid fa-circle-check";
-
-    let notificationTitle = document.createElement("div");
-    notificationTitle.textContent = title;
-    notificationTitle.className = "title";
-
-    let notificationMessageText = document.createElement("div");
-    notificationMessageText.textContent = message;
-    notificationMessageText.className = "message-text";
-
-    notificationMessageContent.append(notificationIcon, notificationTitle, notificationMessageText);
-    notificationMessage.appendChild(notificationMessageContent);
-
-    notificationCenter.appendChild(notificationMessage);
-
-    setTimeout(() => {
-        notificationCenter.removeChild(notificationMessage);
-    }, 3000);
-
-    notificationMessage.addEventListener("click", notificationCenter.removeChild(notificationMessage));
-}
-
-function showError(title, message) {
-    let notificationMessage = document.createElement("div");
-    notificationMessage.className = "notification-error";
-
-    let notificationMessageContent = document.createElement("div");
-    notificationMessageContent.className = "message";
-
-    let notificationIcon = document.createElement("i");
-    notificationIcon.className = "fa-solid fa-circle-xmark";
-
-    let notificationTitle = document.createElement("div");
-    notificationTitle.textContent = title;
-    notificationTitle.className = "title";
-
-    let notificationMessageText = document.createElement("div");
-    notificationMessageText.textContent = message;
-    notificationMessageText.className = "message-text";
-
-    notificationMessageContent.append(notificationIcon, notificationTitle, notificationMessageText);
-    notificationMessage.appendChild(notificationMessageContent);
-
-    notificationCenter.appendChild(notificationMessage);
-
-    setTimeout(() => {
-        notificationCenter.removeChild(notificationMessage);
-    }, 3000);
 }
 
 // Test Logic
@@ -334,7 +272,7 @@ function handleOnValue() {
 
             battleHeading.style.visibility = "visible";
             battleHeading.style.color = "var(--header-color)";
-            if ((tree.player1WillNextt && self == "player1") || (tree.player2WillNext && self != "player1")) {
+            if ((tree.player1WillNext && self == "player1") || (tree.player2WillNext && self != "player1")) {
                 battleHeading.textContent = "waiting for challenger to be ready...";
             } else if ((tree.player1WillNext && self != "player1") || (tree.player2WillNext && self == "player1")) {
                 battleHeading.textContent = "challenger wants a new match...";
