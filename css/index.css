@@ -469,7 +469,8 @@ footer {
     display: none;
     grid-template-columns: auto 1fr;
     gap: 1rem;
-    width: 90%;
+    padding: .5rem;
+    width: 100%;
 }
 
 .wpm_accuracy_text * {
