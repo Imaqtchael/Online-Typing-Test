@@ -706,10 +706,6 @@ function handleUserInput(uInput) {
 
         if (wrongInput > 0) {
             wrongInput -= 1;
-
-            if (wrongInput == 0) {
-                textarea.style.caretColor = "var(--tertiary-color)";
-            }
         } else {
             correctInput -= 1;
         }
@@ -720,7 +716,6 @@ function handleUserInput(uInput) {
             correctInputIndex.push([userInput.length - 1, userInput.length]);
             typedType.push("correct");
             correctInput += 1;
-            textarea.style.caretColor = "var(--tertiary-color)";
         } else {
             wrongInputIndex.push([userInput.length - 1, userInput.length]);
             typedType.push("wrong");
@@ -736,6 +731,8 @@ function handleUserInput(uInput) {
             }
         }
     }
+
+    textarea.style.caretColor = typedType[typedType.length - 1] == "correct" || typedType.length == 0 ? "var(--tertiary-color)" : "var(--wrong-color)";
 
     let cursorPosition = userInput.length;
     textarea.selectionEnd = cursorPosition;
