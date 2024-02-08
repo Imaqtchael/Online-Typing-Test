@@ -9,7 +9,7 @@ const app = initializeApp(firebaseSettings);
 const database = getDatabase(app);
 let bucketKey, self;
 
-let multiplayerBaseLink = window.location.toString().indexOf("192") != -1 ? "https://mjbarcenas.github.io/keybored?code=" : "192.168.1.3:5501?code=";
+let multiplayerBaseLink = location.protocol + '//' + location.host + location.pathname + "?code=";
 let battleTextArea = document.querySelector("#battle-textarea");
 let codeLink = document.querySelector(".code-link");
 let battleTypedWordCount = document.querySelector("#battle-typed-word");
@@ -391,6 +391,10 @@ function cleanBattleTextarea() {
 }
 
 function manageBattleTest() {
+    if (battle_correctInput == 0) {
+        return;
+    }
+
     let wpm = Math.floor((battle_correctInput / 5) * (60 / battle_secondsPassed));
     let accuracy = battle_totalWrongInput == 0 ? 100 : Math.floor(((battle_correctInput - battle_totalWrongInput) / battle_toBeTyped.length) * 100);
 
