@@ -21,16 +21,6 @@ function readTextFile(file) {
     });
 }
 
-function hideMultiplayerIfOnline() {
-    let multiplayerButton = document.querySelector("button#multiplayer");
-
-    if (window.navigator.onLine) {
-        multiplayerButton.style.display = "inline-block";
-    } else {
-        multiplayerButton.style.display = "none";
-    }
-}
-
 async function fetchQuote(quotes) {
     let allText = await readTextFile("quotes.txt");
     let result = [];
@@ -437,10 +427,75 @@ function toggleTheme() {
     }
 }
 
-function goHome() {
-    let winLocation = window.location.toString();
-    let newLocation = winLocation.slice(0, winLocation.indexOf("?"));
-    window.location.replace(newLocation);
+function goHome(showFunc = null, title = null, text = null) {
+    if (showFunc != null) {
+        showFunc(title, text);
+        setTimeout(() => {
+            let winLocation = window.location.toString();
+            let newLocation = winLocation.slice(0, winLocation.indexOf("?"));
+            window.location.replace(newLocation);
+        }, 3000);
+    }
+}
+
+let notificationCenter = document.querySelector(".notification-center");
+
+function showMessage(title, message) {
+    let notificationMessage = document.createElement("div");
+    notificationMessage.className = "notification-message";
+
+    let notificationMessageContent = document.createElement("div");
+    notificationMessageContent.className = "message";
+
+    let notificationIcon = document.createElement("i");
+    notificationIcon.className = "fa-solid fa-circle-check";
+
+    let notificationTitle = document.createElement("div");
+    notificationTitle.textContent = title;
+    notificationTitle.className = "title";
+
+    let notificationMessageText = document.createElement("div");
+    notificationMessageText.textContent = message;
+    notificationMessageText.className = "message-text";
+
+    notificationMessageContent.append(notificationIcon, notificationTitle, notificationMessageText);
+    notificationMessage.appendChild(notificationMessageContent);
+
+    notificationCenter.appendChild(notificationMessage);
+
+    setTimeout(() => {
+        notificationCenter.removeChild(notificationMessage);
+    }, 3000);
+
+    notificationMessage.addEventListener("click", notificationCenter.removeChild(notificationMessage));
+}
+
+function showError(title, message) {
+    let notificationMessage = document.createElement("div");
+    notificationMessage.className = "notification-error";
+
+    let notificationMessageContent = document.createElement("div");
+    notificationMessageContent.className = "message";
+
+    let notificationIcon = document.createElement("i");
+    notificationIcon.className = "fa-solid fa-circle-xmark";
+
+    let notificationTitle = document.createElement("div");
+    notificationTitle.textContent = title;
+    notificationTitle.className = "title";
+
+    let notificationMessageText = document.createElement("div");
+    notificationMessageText.textContent = message;
+    notificationMessageText.className = "message-text";
+
+    notificationMessageContent.append(notificationIcon, notificationTitle, notificationMessageText);
+    notificationMessage.appendChild(notificationMessageContent);
+
+    notificationCenter.appendChild(notificationMessage);
+
+    setTimeout(() => {
+        notificationCenter.removeChild(notificationMessage);
+    }, 3000);
 }
 
 let toggleThemeButton = document.querySelector("#theme");
@@ -822,8 +877,6 @@ textarea.addEventListener("keydown", function(event) {
     event.preventDefault();
 });
 
-setWebIcon();
-hideMultiplayerIfOnline();
 let urlParams = new URLSearchParams(window.location.search);
 if (!urlParams.has("code")) {
     generateRandom();

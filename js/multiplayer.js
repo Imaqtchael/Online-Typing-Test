@@ -51,6 +51,10 @@ function setMultiplayerText(text) {
 
 let showMultiplayerButton = document.querySelector("#multiplayer");
 showMultiplayerButton.addEventListener("click", () => {
+    hideMultiplayerIfOnline();
+    if (!window.navigator.onLine) {
+        return;
+    }
     showMultiplayer();
     initializeMultiplayer();
 });
@@ -174,6 +178,66 @@ async function refreshFirebaseMultiplayerEntry() {
     }
 
     update(ref(database, bucketKey), gameDetails);
+}
+
+let notificationCenter = document.querySelector(".notification-center");
+
+function showMessage(title, message) {
+    let notificationMessage = document.createElement("div");
+    notificationMessage.className = "notification-message";
+
+    let notificationMessageContent = document.createElement("div");
+    notificationMessageContent.className = "message";
+
+    let notificationIcon = document.createElement("i");
+    notificationIcon.className = "fa-solid fa-circle-check";
+
+    let notificationTitle = document.createElement("div");
+    notificationTitle.textContent = title;
+    notificationTitle.className = "title";
+
+    let notificationMessageText = document.createElement("div");
+    notificationMessageText.textContent = message;
+    notificationMessageText.className = "message-text";
+
+    notificationMessageContent.append(notificationIcon, notificationTitle, notificationMessageText);
+    notificationMessage.appendChild(notificationMessageContent);
+
+    notificationCenter.appendChild(notificationMessage);
+
+    setTimeout(() => {
+        notificationCenter.removeChild(notificationMessage);
+    }, 3000);
+
+    notificationMessage.addEventListener("click", notificationCenter.removeChild(notificationMessage));
+}
+
+function showError(title, message) {
+    let notificationMessage = document.createElement("div");
+    notificationMessage.className = "notification-error";
+
+    let notificationMessageContent = document.createElement("div");
+    notificationMessageContent.className = "message";
+
+    let notificationIcon = document.createElement("i");
+    notificationIcon.className = "fa-solid fa-circle-xmark";
+
+    let notificationTitle = document.createElement("div");
+    notificationTitle.textContent = title;
+    notificationTitle.className = "title";
+
+    let notificationMessageText = document.createElement("div");
+    notificationMessageText.textContent = message;
+    notificationMessageText.className = "message-text";
+
+    notificationMessageContent.append(notificationIcon, notificationTitle, notificationMessageText);
+    notificationMessage.appendChild(notificationMessageContent);
+
+    notificationCenter.appendChild(notificationMessage);
+
+    setTimeout(() => {
+        notificationCenter.removeChild(notificationMessage);
+    }, 3000);
 }
 
 // Test Logic
@@ -412,7 +476,7 @@ function battle_startTimer() {
 
         if (battle_secondsPassed > 200) {
             stopBattle();
-            goHome();
+            goHome(showError, "Error", "The system didn't receive any feedback, going back to normal mode.");
         }
 
         if (battleLastTypedLength == battle_input) {
@@ -442,6 +506,16 @@ function focusBattleTyping() {
     navButtons.style.visibility = "hidden";
     codeLink.style.visibility = "hidden";
     battleParagraphButtons.style.visibility = "hidden";
+}
+
+function hideMultiplayerIfOnline() {
+    let multiplayerButton = document.querySelector("button#multiplayer");
+
+    if (window.navigator.onLine) {
+        multiplayerButton.style.display = "inline-block";
+    } else {
+        multiplayerButton.style.display = "none";
+    }
 }
 
 let battle_typingFocused = false
@@ -620,14 +694,14 @@ battleTextArea.addEventListener("keydown", function(event) {
 
 localStorage.removeItem("code");
 cleanFirebase();
+hideMultiplayerIfOnline();
 if (urlParams.has("code")) {
     bucketKey = urlParams.get("code");
     self = "player2"
     let dbSnapshot = await get(ref(database, bucketKey));
     console.log(dbSnapshot.val()); // <-- Gives the value of the whole tree
     if (!dbSnapshot.exists() || dbSnapshot.val().gameFinish) {
-        alert("Game does not exists or is finished");
-        goHome();
+        goHome(showError, "Error", "The game you wanted to join do not exist or is already finished, the game will now reload.");
     } else {
         showMultiplayer();
         update(ref(database, bucketKey), {
