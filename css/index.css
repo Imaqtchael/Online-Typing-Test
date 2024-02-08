@@ -671,9 +671,6 @@ rgba(138,18,12,.9) --> bad background
     #words-input {
         width: 7rem;
     }
-    #multiplayer-body>div {
-        font-size: 48px !important;
-    }
     .code-link {
         width: 100%;
     }

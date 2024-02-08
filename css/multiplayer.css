@@ -21,7 +21,8 @@
 
 .code-link {
     width: 60%;
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(3, auto);
     gap: .5rem;
     align-items: center;
     justify-content: center;
@@ -107,62 +108,12 @@
     width: 100%;
 }
 
-.code-popup {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 100;
-    background-color: rgba(0, 0, 0, 0.75);
-    height: 100%;
-    width: 100%;
-}
-
-.code-body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 2rem;
-    padding: 2rem;
-    border-radius: 0.5rem;
-    min-height: 10rem;
-    min-width: 10rem;
-}
-
-.code-body>input {
-    outline: none;
-    border: 2px solid transparent;
-    border-radius: 0.5rem;
-    background-color: var(--secondary-color);
-    font-size: var(--text-size);
-    padding: .5rem;
-    width: 100%;
-    color: var(--header-color)
-}
-
-.code-body>input:focus-visible {
-    border-color: var(--header-color);
-}
-
-.code-body>p {
-    font-size: var(--text-size);
-}
-
-.code-body>button {
-    width: 100%;
-    font-size: var(--medium-text);
-    padding: 0.5rem;
-    outline: none;
-    border: none;
-    border-radius: 0.5rem;
-    background-color: var(--secondary-color);
-}
-
-.code-body>button:hover {
-    cursor: pointer;
-    background-color: var(--header-color);
-    color: var(--text-color);
+@media only screen and (max-width: 560px) {
+    .code-link {
+        grid-template-columns: auto auto;
+        grid-template-rows: auto auto;
+    }
+    .code-link span {
+        grid-column: 1/3;
+    }
 }

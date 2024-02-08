@@ -199,6 +199,10 @@ function handleOnValue() {
         let battle_timer = tree.timer;
         let battle_winner = tree.winner;
 
+        if (battleTextArea.value != battle_text) {
+            setMultiplayerText(battle_text);
+        }
+
         if (bothPlayerPresent && !battle_gameReady) {
             stopBattle();
             cleanBattleTextarea();
@@ -212,7 +216,6 @@ function handleOnValue() {
             startCountdownTimer();
 
             battle_toBeTyped = battle_text;
-            setMultiplayerText(battle_text);
             battleTextArea.setAttribute("set", "");
         } else if (battle_gameReady && battle_timer >= 0 && !battle_gameStarted) {
             if (battle_timer > 0) {
@@ -407,9 +410,9 @@ function manageBattleTest() {
             correctInput: battle_correctInput,
             wrongInput: battle_wrongInput
         });
+        selfWPMSpan.textContent = wpm;
     }
 
-    selfWPMSpan.textContent = wpm;
 }
 
 let battleLastTypedLength = 0;
@@ -643,14 +646,23 @@ if (urlParams.has("code")) {
     bucketKey = urlParams.get("code");
     self = "player2"
     let dbSnapshot = await get(ref(database, bucketKey));
-    console.log(dbSnapshot.val()); // <-- Gives the value of the whole tree
-    if (!dbSnapshot.exists() || dbSnapshot.val().gameFinish) {
-        goHome(showError, "Error", "The game you wanted to join do not exist or is already finished, the game will now reload.");
-    } else {
-        showMultiplayer();
-        update(ref(database, bucketKey), {
-            [self + "Present"]: true
-        });
-        handleOnValue();
+    //console.log(dbSnapshot.val()); // <-- Gives the value of the whole tree
+    if (!dbSnapshot.exists()) {
+        goHome(showError, "Error", "The game you want to join does not exist, the game will now reload.");
+    } else if (dbSnapshot.exists()) {
+        let dbValue = dbSnapshot.val();
+        let lastPlayedSecondsPassed = (new Date().getTime() - dbValue.lastPlayed) / 1000;
+        if (lastPlayedSecondsPassed > 60 * 5) {
+            remove(ref(database, bucketKey));
+            goHome(showError, "Error", "The game you wanted to join is inactive, the game will now reload.");
+        } else {
+            showMultiplayer();
+            handleOnValue();
+            blurBattleTyping();
+            battlePlayerDiv.style.visibility = "visible";
+            update(ref(database, bucketKey), {
+                [self + "Present"]: true
+            });
+        }
     }
 }
