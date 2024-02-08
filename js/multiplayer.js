@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-import { getDatabase, ref, push, onValue, get, query, update, remove } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
+import { getDatabase, ref, push, onValue, get, update, remove } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
 
 const firebaseSettings = {
     databaseURL: "https://keybored-cc9f6-default-rtdb.asia-southeast1.firebasedatabase.app/"
@@ -9,54 +9,28 @@ const app = initializeApp(firebaseSettings);
 const database = getDatabase(app);
 let bucketKey, self;
 
-async function refreshFirebaseMultiplayerEntry() {
-    await createNewBattleText();
+let multiplayerBaseLink = window.navigator.onLine * 0 ? "https://mjbarcenas.github.io/keybored?code=" : "192.168.1.3:5501?code=";
+let battleTextArea = document.querySelector("#battle-textarea");
+let codeLink = document.querySelector(".code-link");
+let battleTypedWordCount = document.querySelector("#battle-typed-word");
+let battleTotalWordCount = document.querySelector("#battle-word-total");
+let battleEnemyScoreSpan = document.querySelector("#battle-enemy-score");
+let battleSelfScoreSpan = document.querySelector("#battle-self-score");
+let countDownTimer;
+let countDown = 5;
 
-    let gameDetails = {
-        text: battle_toBeTyped,
-        gameReady: false,
-        gameStarted: false,
-        gameFinish: false,
-        timer: 10,
-        winner: "none",
-        player1: {
-            finished: false,
-            wrongInput: 0,
-            correctInput: 0,
-            wpm: 0,
-            accuracy: 0,
-            willNext: false
-        },
-        player2: {
-            finished: false,
-            wrongInput: 0,
-            correctInput: 0,
-            wpm: 0,
-            accuracy: 0,
-            willNext: false
+function startCountdownTimer() {
+    battleHeading.style.color = "var(--header-color)"
+    countDownTimer = setInterval(() => {
+        countDown -= 1;
+        if (self == "player1") {
+            update(ref(database, bucketKey), { timer: countDown });
         }
-
-    }
-
-    update(ref(database, bucketKey), gameDetails);
+    }, 1000);
 }
 
-
-async function initializeMultiplayer() {
-    let bucketKeyLog = localStorage.getItem("code");
-    self = "player1"
-    if (bucketKeyLog == null) {
-        await createNewBattleText();
-        createFirebaseMultiplayerEntry();
-    } else {
-        let dbSnapshot = await get(ref(database, bucketKey));
-        if (dbSnapshot.exists()) {
-            await refreshFirebaseMultiplayerEntry();
-        }
-        // Create an else condittion checking if you are the creator of the game
-        // Might be implemented by generating a unique code in your machine and
-        // using it as the creator key in your gameDetails
-    }
+function stopCountdownTimer() {
+    clearInterval(countDownTimer);
 }
 
 async function createNewBattleText() {
@@ -70,35 +44,10 @@ async function createNewBattleText() {
     battle_toBeTyped = battle_toBeTyped.join(" ");
 }
 
-function cleanBattleTextarea() {
-    battleTextArea.style.caretColor = "var(--tertiary-color)";
-
-    battleTextArea.selectionEnd = 0;
-    battleTextArea.selectionStart = 0;
-
-    $("#battle-textarea").highlightWithinTextarea({
-        highlight: [{
-            highlight: null,
-            className: "correct"
-        }, {
-            highlight: null,
-            className: "wrong"
-        }, {
-            highlight: null,
-            className: "enemy"
-        }]
-    });
+function setMultiplayerText(text) {
+    battleTotalWordCount.textContent = text.split(" ").length;
+    battleTextArea.value = text;
 }
-
-let multiplayerBaseLink = window.navigator.onLine * 0 ? "https://mjbarcenas.github.io/keybored?code=" : "192.168.1.3:5501?code=";
-let battleTextArea = document.querySelector("#battle-textarea");
-let codeLink = document.querySelector(".code-link");
-let battleTypedWordCount = document.querySelector("#battle-typed-word");
-let battleTotalWordCount = document.querySelector("#battle-word-total");
-let battleEnemyScoreSpan = document.querySelector("#battle-enemy-score");
-let battleSelfScoreSpan = document.querySelector("#battle-self-score");
-let countDownTimer;
-let countDown = 5;
 
 let showMultiplayerButton = document.querySelector("#multiplayer");
 showMultiplayerButton.addEventListener("click", () => {
@@ -118,25 +67,43 @@ function showMultiplayer() {
     typingTestBody.style.display = "none";
     historyBody.style.display = "none";
 }
-localStorage.removeItem("code");
 
-function startCountdownTimer() {
-    battleHeading.style.color = "var(--header-color)"
-    countDownTimer = setInterval(() => {
-        countDown -= 1;
-        if (self == "player1") {
-            update(ref(database, bucketKey), { timer: countDown });
+async function initializeMultiplayer() {
+    let bucketKeyLog = localStorage.getItem("code");
+    self = "player1"
+    if (bucketKeyLog == null) {
+        await createNewBattleText();
+        createFirebaseMultiplayerEntry();
+    } else {
+        let dbSnapshot = await get(ref(database, bucketKey));
+        if (dbSnapshot.exists()) {
+            let dbValue = dbSnapshot.val();
+            let dbBucketKeys = Object.keys(dbValue);
+            if (dbBucketKeys.includes(bucketKeyLog)) {
+                if (self == "player1" && dbValue[bucketKeyLog].gameFinish) {
+                    await refreshFirebaseMultiplayerEntry();
+                }
+            }
         }
-    }, 1000);
+        // Create an else condittion checking if you are the creator of the game
+        // Might be implemented by generating a unique code in your machine and
+        // using it as the creator key in your gameDetails
+    }
 }
 
-function stopCountdownTimer() {
-    clearInterval(countDownTimer);
-}
-
-function setMultiplayerText(text) {
-    battleTotalWordCount.textContent = text.split(" ").length;
-    battleTextArea.value = text;
+async function cleanFirebase() {
+    let dbSnapshot = await get(ref(database));
+    if (dbSnapshot.exists()) {
+        let dbValue = dbSnapshot.val();
+        let bucketKeys = Object.keys(dbValue);
+        let dateNow = new Date().getTime();
+        for (let i = 0; i < bucketKeys.length; i++) {
+            let bucket = dbValue[bucketKeys[i]];
+            if (((dateNow - bucket.lastPlayed) / 1000) > 60 * 5) {
+                remove(ref(database, bucketKeys[i]));
+            }
+        }
+    }
 }
 
 async function createFirebaseMultiplayerEntry() {
@@ -148,9 +115,12 @@ async function createFirebaseMultiplayerEntry() {
         timer: 10,
         winner: "none",
         player1Score: 0,
+        player1WillNext: false,
         player1Present: true,
         player2Score: 0,
+        player2WillNext: false,
         player2Present: false,
+        lastPlayed: new Date().getTime(),
         player1: {
             finished: false,
             wrongInput: 0,
@@ -176,6 +146,38 @@ async function createFirebaseMultiplayerEntry() {
     handleOnValue();
 }
 
+async function refreshFirebaseMultiplayerEntry() {
+    await createNewBattleText();
+
+    let gameDetails = {
+        text: battle_toBeTyped,
+        gameReady: false,
+        gameStarted: false,
+        gameFinish: false,
+        timer: 10,
+        winner: "none",
+        lastPlayed: new Date().getTime(),
+        player1: {
+            finished: false,
+            wrongInput: 0,
+            correctInput: 0,
+            wpm: 0,
+            accuracy: 0
+        },
+        player2: {
+            finished: false,
+            wrongInput: 0,
+            correctInput: 0,
+            wpm: 0,
+            accuracy: 0
+        }
+    }
+
+    update(ref(database, bucketKey), gameDetails);
+}
+
+// Test Logic
+
 let battlePlayerDiv = document.querySelector("#player-div");
 let battleParagraphButtons = document.querySelector("#battle-paragraph-buttons");
 let enemyWPMSpan = document.querySelector("#battle-enemy-wpm");
@@ -199,6 +201,8 @@ function handleOnValue() {
             stopBattle();
             cleanBattleTextarea();
             focusBattleTyping();
+            battlePlayerDiv.style.visibility = "visible";
+            battleHeading.style.visibility = "visible";
 
             update(ref(database, bucketKey), { gameReady: true });
             codeLink.style.visibility = "hidden";
@@ -246,28 +250,29 @@ function handleOnValue() {
                 battleHeading.style.color = "var(--header-color)";
             } else if (battle_winner == self) {
                 battleHeading.textContent = "you win!";
-                battleSelfScoreSpan.textContent = tree.player1Score;
                 battleHeading.style.color = "var(--tertiary-color)";
             } else if (battle_winner != self) {
                 battleHeading.textContent = "you lose!";
-                battleEnemyScoreSpan.textContent = tree.player1Score;
                 battleHeading.style.color = "var(--wrong-color)";
             }
+
+            battleSelfScoreSpan.textContent = self == "player1" ? tree.player1Score : tree.player2Score;
+            battleEnemyScoreSpan.textContent = self == "player1" ? tree.player2Score : tree.player1Score;
 
             battleHeading.style.visibility = "visible";
             battleTextArea.disabled = true;
         }
 
-        if (player1.willNext || player2.willNext) {
-            if ((player1.willNext && player2.willNext) && self == "player1") {
+        if (tree.player1WillNext || tree.player2WillNext) {
+            if ((tree.player1WillNext && tree.player2WillNext) && self == "player1") {
                 refreshFirebaseMultiplayerEntry();
             }
 
             battleHeading.style.visibility = "visible";
             battleHeading.style.color = "var(--header-color)";
-            if ((player1.willNext && self == "player1") || (player2.willNext && self != "player1")) {
+            if ((tree.player1WillNextt && self == "player1") || (tree.player2WillNext && self != "player1")) {
                 battleHeading.textContent = "waiting for challenger to be ready...";
-            } else if ((player1.willNext && self != "player1") || (player2.willNext && self == "player1")) {
+            } else if ((tree.player1WillNext && self != "player1") || (tree.player2WillNext && self == "player1")) {
                 battleHeading.textContent = "challenger wants a new match...";
             }
         }
@@ -361,6 +366,26 @@ function stopBattle() {
     selfWPMSpan.textContent = 0;
     enemyWPMSpan.textContent = 0;
     battleTypedWordCount.textContent = 0;
+}
+
+function cleanBattleTextarea() {
+    battleTextArea.style.caretColor = "var(--tertiary-color)";
+
+    battleTextArea.selectionEnd = 0;
+    battleTextArea.selectionStart = 0;
+
+    $("#battle-textarea").highlightWithinTextarea({
+        highlight: [{
+            highlight: null,
+            className: "correct"
+        }, {
+            highlight: null,
+            className: "wrong"
+        }, {
+            highlight: null,
+            className: "enemy"
+        }]
+    });
 }
 
 function manageBattleTest() {
@@ -540,7 +565,9 @@ function handleMultiplayerBattle(uInput) {
 }
 
 function willNext() {
-    update(ref(database, bucketKey + "/" + self), { willNext: true });
+    update(ref(database, bucketKey), {
+        [self + "WillNext"]: true
+    });
 }
 
 let battleWillNext = document.querySelector("#battle-next-button");
@@ -587,11 +614,12 @@ battleTextArea.addEventListener("input", function(event) {
 });
 battleTextArea.addEventListener("keydown", function(event) {
     event.preventDefault();
-    console.log(battleTextArea.disabled);
     if (event.key == "Unidentified") return;
     handleMultiplayerBattle(event.key);
 });
 
+localStorage.removeItem("code");
+cleanFirebase();
 if (urlParams.has("code")) {
     bucketKey = urlParams.get("code");
     self = "player2"

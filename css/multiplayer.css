@@ -71,10 +71,10 @@
     text-align: center;
 }
 
-#enemy-div,
 #player-div,
-#battle-paragraph-buttons {
-    /* display: none; */
+#battle-paragraph-buttons,
+#battle-heading {
+    visibility: hidden;
 }
 
 #player-div>.player-title {
