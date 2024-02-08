@@ -268,6 +268,10 @@ function handleOnValue() {
         if (tree.player1WillNext || tree.player2WillNext) {
             if ((tree.player1WillNext && tree.player2WillNext) && self == "player1") {
                 refreshFirebaseMultiplayerEntry();
+                update(ref(database, bucketKey), {
+                    player1WillNext: false,
+                    player2WillNext: false,
+                })
             }
 
             battleHeading.style.visibility = "visible";
@@ -332,8 +336,6 @@ function copyMultiplayerLink() {
     copyButton.style.color = "var(--header-color)";
     setTimeout(() => {
         copyButton.textContent = "copy";
-        copyButton.style.backgroundColor = "var(--tertiary-color)";
-        copyButton.style.color = "var(--primary-color)";
     }, 2000);
 }
 
