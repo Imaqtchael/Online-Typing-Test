@@ -50,16 +50,16 @@ function setMultiplayerText(text) {
 }
 
 let showMultiplayerButton = document.querySelector("#multiplayer");
-showMultiplayerButton.addEventListener("click", () => {
+showMultiplayerButton.addEventListener("click", async() => {
     if (!window.navigator.onLine) {
         hideMultiplayerIfOnline();
         return;
     }
 
-    showMultiplayer();
     if (!bucketKey) {
-        initializeMultiplayer();
+        await initializeMultiplayer();
     }
+    showMultiplayer();
 });
 
 function showMultiplayer() {
@@ -83,12 +83,13 @@ async function initializeMultiplayer() {
         createFirebaseMultiplayerEntry();
     } else {
         let dbSnapshot = await get(ref(database, bucketKey));
-        if (dbSnapshot.exists()) {
+        if (dbSnapshot.exists() && (dbSnapshot.val().gameFinish || dbSnapshot.val().player2Present)) {
+            console.log("ifed");
             let dbValue = dbSnapshot.val();
             if (dbValue.gameFinish) {
                 handleOnValue();
                 await refreshFirebaseMultiplayerEntry();
-            } else {
+            } else if (dbValue.player2Present) {
                 setCodeToInput(multiplayerBaseLink + bucketKey);
                 setMultiplayerText(dbValue.text);
                 battle_toBeTyped = dbValue.text;
@@ -115,6 +116,8 @@ async function initializeMultiplayer() {
                 battleTextArea.focus();
             }
         } else {
+            remove(ref(database, bucketKey));
+            console.log("elsed");
             localStorage.removeItem("code");
             initializeMultiplayer();
         }
@@ -142,7 +145,7 @@ async function createFirebaseMultiplayerEntry() {
         gameReady: false,
         gameStarted: false,
         gameFinish: false,
-        timer: 10,
+        timer: 5,
         winner: "none",
         player1Score: 0,
         player1WillNext: false,
@@ -182,7 +185,7 @@ async function refreshFirebaseMultiplayerEntry() {
         gameReady: false,
         gameStarted: false,
         gameFinish: false,
-        timer: 10,
+        timer: 5,
         winner: "none",
         lastPlayed: new Date().getTime(),
         player1: {
@@ -656,6 +659,11 @@ battleTextArea.addEventListener("keydown", function(event) {
     event.preventDefault();
     if (event.key == "Unidentified") return;
     handleMultiplayerBattle(event.key);
+});
+
+window.addEventListener("beforeunload", () => {
+    self == "player1" ? deleteFirebaseMultiplayerEntry() : null;
+    cleanFirebase();
 });
 
 // localStorage.removeItem("code");
