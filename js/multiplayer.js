@@ -77,7 +77,6 @@ function showMultiplayer() {
 
 async function initializeMultiplayer() {
     bucketKey = localStorage.getItem("code");
-    console.log(bucketKey);
     self = "player1"
     if (bucketKey == null) {
         await createNewBattleText();
@@ -85,11 +84,8 @@ async function initializeMultiplayer() {
     } else {
         let dbSnapshot = await get(ref(database, bucketKey));
         if (dbSnapshot.exists()) {
-            console.log(bucketKey);
-            console.log("exist")
             let dbValue = dbSnapshot.val();
             if (dbValue.gameFinish) {
-                console.log("finished");
                 handleOnValue();
                 await refreshFirebaseMultiplayerEntry();
             } else {
@@ -119,7 +115,6 @@ async function initializeMultiplayer() {
                 battleTextArea.focus();
             }
         } else {
-            console.log("cleared")
             localStorage.removeItem("code");
             initializeMultiplayer();
         }

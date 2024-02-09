@@ -808,21 +808,20 @@ function handleUserInput(uInput) {
     textarea.selectionEnd = cursorPosition;
     textarea.selectionStart = cursorPosition;
 
-    // console.log(correctInputIndex, combineOverlappingArrays(correctInputIndex));
-    // let dummyWrong = Array.from(wrongInputIndex).map(x => {
-    //     return Array.from(x);
-    // });
+    let dummyWrong = Array.from(wrongInputIndex).map(x => {
+        return Array.from(x);
+    });
 
-    // let dummyCorrect = Array.from(correctInputIndex).map(x => {
-    //     return Array.from(x);
-    // });
+    let dummyCorrect = Array.from(correctInputIndex).map(x => {
+        return Array.from(x);
+    });
 
     $("#single-player-textarea").highlightWithinTextarea({
         highlight: [{
-            highlight: [0, correctInput],
+            highlight: dummyCorrect.length > 0 ? dummyCorrect : null,
             className: "correct"
         }, {
-            highlight: [correctInput, correctInput + wrongInput],
+            highlight: dummyWrong.length > 0 ? dummyWrong : null,
             className: "wrong"
         }]
     })
