@@ -51,12 +51,15 @@ function setMultiplayerText(text) {
 
 let showMultiplayerButton = document.querySelector("#multiplayer");
 showMultiplayerButton.addEventListener("click", () => {
-    hideMultiplayerIfOnline();
     if (!window.navigator.onLine) {
+        hideMultiplayerIfOnline();
         return;
     }
+
     showMultiplayer();
-    initializeMultiplayer();
+    if (!bucketKey) {
+        initializeMultiplayer();
+    }
 });
 
 function showMultiplayer() {
@@ -73,25 +76,53 @@ function showMultiplayer() {
 }
 
 async function initializeMultiplayer() {
-    let bucketKeyLog = localStorage.getItem("code");
+    bucketKey = localStorage.getItem("code");
+    console.log(bucketKey);
     self = "player1"
-    if (bucketKeyLog == null) {
+    if (bucketKey == null) {
         await createNewBattleText();
         createFirebaseMultiplayerEntry();
     } else {
         let dbSnapshot = await get(ref(database, bucketKey));
         if (dbSnapshot.exists()) {
+            console.log(bucketKey);
+            console.log("exist")
             let dbValue = dbSnapshot.val();
-            let dbBucketKeys = Object.keys(dbValue);
-            if (dbBucketKeys.includes(bucketKeyLog)) {
-                if (self == "player1" && dbValue[bucketKeyLog].gameFinish) {
-                    await refreshFirebaseMultiplayerEntry();
+            if (dbValue.gameFinish) {
+                console.log("finished");
+                handleOnValue();
+                await refreshFirebaseMultiplayerEntry();
+            } else {
+                setCodeToInput(multiplayerBaseLink + bucketKey);
+                setMultiplayerText(dbValue.text);
+                battle_toBeTyped = dbValue.text;
+                handleOnValue();
+                if (dbValue.timer > 0) {
+                    countDown = dbValue.timer;
+                    startCountdownTimer();
                 }
+
+                battlePlayerDiv.style.visibility = "visible";
+                codeLink.style.visibility = "hidden";
+
+                if (dbValue.timer == 0) {
+                    battleHeading.style.visibility = "hidden";
+                    battleTextArea.disabled = false;
+                    battle_startTimer();
+                } else {
+                    battleHeading.style.visibility = "visible";
+                    battleTextArea.disabled = true;
+                }
+
+                battleTextArea.setSelectionRange(0, 0);
+                battleTextArea.blur();
+                battleTextArea.focus();
             }
+        } else {
+            console.log("cleared")
+            localStorage.removeItem("code");
+            initializeMultiplayer();
         }
-        // Create an else condittion checking if you are the creator of the game
-        // Might be implemented by generating a unique code in your machine and
-        // using it as the creator key in your gameDetails
     }
 }
 
@@ -103,7 +134,7 @@ async function cleanFirebase() {
         let dateNow = new Date().getTime();
         for (let i = 0; i < bucketKeys.length; i++) {
             let bucket = dbValue[bucketKeys[i]];
-            if (((dateNow - bucket.lastPlayed) / 1000) > 60 * 5) {
+            if (((dateNow - bucket.lastPlayed) / 1000) > 60 * 10) {
                 remove(ref(database, bucketKeys[i]));
             }
         }
@@ -176,6 +207,7 @@ async function refreshFirebaseMultiplayerEntry() {
     }
 
     update(ref(database, bucketKey), gameDetails);
+    setCodeToInput(multiplayerBaseLink + bucketKey);
 }
 
 // Test Logic
@@ -199,10 +231,6 @@ function handleOnValue() {
         let battle_timer = tree.timer;
         let battle_winner = tree.winner;
 
-        if (battleTextArea.value != battle_text) {
-            setMultiplayerText(battle_text);
-        }
-
         if (bothPlayerPresent && !battle_gameReady) {
             stopBattle();
             cleanBattleTextarea();
@@ -212,9 +240,9 @@ function handleOnValue() {
 
             update(ref(database, bucketKey), { gameReady: true });
             codeLink.style.visibility = "hidden";
-            battlePlayerDiv.style.display = "block";
             startCountdownTimer();
 
+            setMultiplayerText(battle_text);
             battle_toBeTyped = battle_text;
             battleTextArea.setAttribute("set", "");
         } else if (battle_gameReady && battle_timer >= 0 && !battle_gameStarted) {
@@ -300,9 +328,6 @@ function handleOnValue() {
                 highlight: highlighted
             });
 
-            let cursorPosition = battle_userInput.length;
-            battleTextArea.setSelectionRange(cursorPosition, cursorPosition);
-
             if (battle_toBeTyped.length - battle_userInput.length <= 40) {
                 battleTextArea.scrollTop = battleTextArea.scrollHeight;
                 battleTextArea.focus();
@@ -310,7 +335,6 @@ function handleOnValue() {
                 battleTextArea.blur();
                 battleTextArea.focus();
             }
-
             enemyWPMSpan.textContent = enemyWPM;
         }
     });
@@ -421,9 +445,9 @@ function battle_startTimer() {
     battle_secondsPassedCounter = setInterval(() => {
         battle_secondsPassed += 1;
 
-        if (battle_secondsPassed > 200) {
+        if (battle_secondsPassed > 300) {
             stopBattle();
-            goHome(showError, "Error", "The system didn't receive any feedback, going back to normal mode.");
+            goHome(showError, "Error", "The game cannot run for too long, going back to normal mode.");
         }
 
         if (battleLastTypedLength == battle_input) {
@@ -639,8 +663,8 @@ battleTextArea.addEventListener("keydown", function(event) {
     handleMultiplayerBattle(event.key);
 });
 
-localStorage.removeItem("code");
-cleanFirebase();
+// localStorage.removeItem("code");
+// cleanFirebase();
 hideMultiplayerIfOnline();
 if (urlParams.has("code")) {
     bucketKey = urlParams.get("code");
@@ -652,17 +676,45 @@ if (urlParams.has("code")) {
     } else if (dbSnapshot.exists()) {
         let dbValue = dbSnapshot.val();
         let lastPlayedSecondsPassed = (new Date().getTime() - dbValue.lastPlayed) / 1000;
-        if (lastPlayedSecondsPassed > 60 * 5) {
-            remove(ref(database, bucketKey));
-            goHome(showError, "Error", "The game you wanted to join is inactive, the game will now reload.");
-        } else {
+        if (dbValue.gameFinish) {
             showMultiplayer();
             handleOnValue();
             blurBattleTyping();
             battlePlayerDiv.style.visibility = "visible";
             update(ref(database, bucketKey), {
+                [self + "WillNext"]: true,
                 [self + "Present"]: true
             });
+            setMultiplayerText(dbValue.text);
+            enemyWPMSpan.textContent = self == "player1" ? dbValue.player2.wpm : dbValue.player1.wpm;
+            selfWPMSpan.textContent = self == "player1" ? dbValue.player1.wpm : dbValue.player2.wpm;
+        } else if (lastPlayedSecondsPassed > 60 * 10) {
+            remove(ref(database, bucketKey));
+            goHome(showError, "Error", "The game you wanted to join is inactive, the game will now reload.");
+        } else {
+            showMultiplayer();
+            update(ref(database, bucketKey), {
+                [self + "Present"]: true
+            });
+            setMultiplayerText(dbValue.text);
+            battle_toBeTyped = dbValue.text;
+            handleOnValue();
+
+            battlePlayerDiv.style.visibility = "visible";
+            codeLink.style.visibility = "hidden";
+
+            if (dbValue.timer == 0) {
+                battleHeading.style.visibility = "hidden";
+                battleTextArea.disabled = false;
+                battle_startTimer();
+            } else {
+                battleHeading.style.visibility = "visible";
+                battleTextArea.disabled = true;
+            }
+
+            battleTextArea.setSelectionRange(0, 0);
+            battleTextArea.blur();
+            battleTextArea.focus();
         }
     }
 }
