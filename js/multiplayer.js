@@ -129,7 +129,7 @@ async function cleanFirebase() {
     if (dbSnapshot.exists()) {
         let dbValue = dbSnapshot.val();
         let bucketKeys = Object.keys(dbValue);
-        let dateNow = await getDate();
+        let dateNow = new Date().getTime();
         for (let i = 0; i < bucketKeys.length; i++) {
             let bucket = dbValue[bucketKeys[i]];
             if (((dateNow - bucket.lastPlayed) / 1000) > 60 * 10) {
@@ -153,7 +153,7 @@ async function createFirebaseMultiplayerEntry() {
         player2Score: 0,
         player2WillNext: false,
         player2Present: false,
-        lastPlayed: await getDate(),
+        lastPlayed: new Date().getTime(),
         player1: {
             finished: false,
             wrongInput: 0,
@@ -187,7 +187,7 @@ async function refreshFirebaseMultiplayerEntry() {
         gameFinish: false,
         timer: 5,
         winner: "none",
-        lastPlayed: await getDate(),
+        lastPlayed: new Date().getTime(),
         player1: {
             finished: false,
             wrongInput: 0,
@@ -613,22 +613,6 @@ function willNext() {
     });
 }
 
-function getDate() {
-    return new Promise((resolve) => {
-        let timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        let dateRequest = new XMLHttpRequest();
-        dateRequest.open("GET", "http://worldtimeapi.org/api/timezone/" + timeZone, false);
-        dateRequest.onreadystatechange = function() {
-            // resolve(dateRequest);
-            if (dateRequest.readyState === 4) {
-                if (dateRequest.status === 200 || dateRequest.status == 0) {}
-                resolve(JSON.parse(dateRequest.responseText).unixtime);
-            }
-        }
-        dateRequest.send();
-    })
-}
-
 let battleWillNext = document.querySelector("#battle-next-button");
 battleWillNext.addEventListener("click", willNext);
 
@@ -694,7 +678,7 @@ if (urlParams.has("code")) {
         goHome(showError, "Error", "The game you want to join does not exist, the game will now reload.");
     } else if (dbSnapshot.exists()) {
         let dbValue = dbSnapshot.val();
-        let lastPlayedSecondsPassed = (await getDate() - dbValue.lastPlayed) / 1000;
+        let lastPlayedSecondsPassed = (new Date().getTime() - dbValue.lastPlayed) / 1000;
         if (dbValue.gameFinish) {
             showMultiplayer();
             handleOnValue();
