@@ -3,6 +3,7 @@ let historyLogChart = new Chart("history-logs", {
     data: {
         labels: logTries,
         datasets: [{
+                label: "accuracy",
                 fill: false,
                 backgroundColor: "rgba(0, 0, 0, 0.1)",
                 borderColor: headerColor,
@@ -18,6 +19,7 @@ let historyLogChart = new Chart("history-logs", {
                 data: accuracyList
             },
             {
+                label: "wpm",
                 fill: false,
                 backgroundColor: "rgba(0, 0, 0, 0.1)",
                 borderColor: tertiaryColor,
@@ -35,13 +37,6 @@ let historyLogChart = new Chart("history-logs", {
         ]
     },
     options: {
-        legend: {
-            display: false
-        },
-        title: {
-            display: true,
-            text: "accuracy history"
-        },
         scales: {
             y: {
                 ticks: {
