@@ -904,8 +904,8 @@ textarea.addEventListener("keydown", function(event) {
 let urlParams = new URLSearchParams(window.location.search);
 let allText, allQuotes;
 (async() => {
-    allText = await readTextFile("easy_words.txt");
-    allQuotes = await readTextFile("quotes.txt");
+    allText = await readTextFile("/assets/texts/easy_words.txt");
+    allQuotes = await readTextFile("/assets/texts/quotes.txt");
     if (!urlParams.has("code")) {
         generateRandom();
         // showMultiplayer();

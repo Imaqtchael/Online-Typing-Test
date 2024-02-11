@@ -666,8 +666,6 @@ window.addEventListener("beforeunload", () => {
     cleanFirebase();
 });
 
-// localStorage.removeItem("code");
-// cleanFirebase();
 hideMultiplayerIfOnline();
 if (urlParams.has("code")) {
     bucketKey = urlParams.get("code");
