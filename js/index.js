@@ -24,7 +24,7 @@ async function fetchQuote(quotes) {
     let result = [];
     return new Promise(resolve => {
         for (let i = 0; i < quotes; i++) {
-            let current = allQuotes[getRandomInteger(0, allQuotes.length)].trim();
+            let current = allQuotes[getRandomInteger(0, allQuotes.length - 1)].trim();
             result.push(current);
         }
 
@@ -55,7 +55,7 @@ async function fetchRandom(words) {
     let result = [];
     return new Promise(resolve => {
         for (let i = 0; i < words; i++) {
-            let current = allText[getRandomInteger(0, allText.length)].trim();
+            let current = allText[getRandomInteger(0, allText.length - 1)].trim();
             result.push(current);
         }
 
