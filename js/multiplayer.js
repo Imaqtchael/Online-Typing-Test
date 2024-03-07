@@ -474,9 +474,9 @@ let updateHighlightTimer = null;
 
 function battle_updateHightlight() {
     updateHighlightTimer = setInterval(() => {
-        if (battle_enemyCorrectInput == lastEnemyInput && battle_correctInput == lastSelfInput) return;
+        if (battle_enemyCorrectInput == lastEnemyInput && battle_input == lastSelfInput) return;
         lastEnemyInput = battle_enemyCorrectInput;
-        lastSelfInput = battle_correctInput;
+        lastSelfInput = battle_input;
         $("#battle-textarea").highlightWithinTextarea({
             highlight: highlighted
         });
