@@ -824,7 +824,7 @@ function handleUserInput(uInput) {
             highlight: dummyWrong.length > 0 ? dummyWrong : null,
             className: "wrong"
         }]
-    })
+    });
 
     if (userInput.length == toBeTyped.length) {
         blurTyping();

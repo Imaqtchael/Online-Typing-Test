@@ -249,6 +249,7 @@ function handleOnValue() {
             } else if (battle_timer >= 0) {
                 update(ref(database, bucketKey), { gameStarted: true });
                 battle_startTimer();
+                battle_updateHightlight();
                 stopCountdownTimer();
                 battleHeading.style.color = "var(--tertiary-color)";
                 battleHeading.textContent = "go!";
@@ -294,6 +295,7 @@ function handleOnValue() {
             battleTextArea.disabled = true;
         }
 
+
         if (tree.player1WillNext || tree.player2WillNext) {
             if ((tree.player1WillNext && tree.player2WillNext) && self == "player1") {
                 refreshFirebaseMultiplayerEntry();
@@ -313,7 +315,7 @@ function handleOnValue() {
         }
 
         let enemy = self == "player1" ? player2 : player1;
-        if ((battle_gameReady && battle_gameStarted && !battle_gameFinish) && (enemy.correctInput > 0 || enemy.wrongInput > 0)) {
+        if ((battle_gameReady && battle_gameStarted && !battle_gameFinish) && enemy.correctInput > 0) {
             battle_enemyCorrectInput = enemy.correctInput;
             let enemyWPM = enemy.wpm;
 
@@ -321,18 +323,23 @@ function handleOnValue() {
                 highlight: battle_enemyCorrectInput > battle_correctInput + battle_wrongInput ? [battle_correctInput + battle_wrongInput, battle_enemyCorrectInput] : null,
                 className: "enemy"
             }];
+            console.log(highlighted);
 
-            $("#battle-textarea").highlightWithinTextarea({
-                highlight: highlighted
-            });
+            // highlighted[2] = {
+            //     highlight: battle_enemyCorrectInput > battle_correctInput + battle_wrongInput ? [battle_correctInput + battle_wrongInput, battle_enemyCorrectInput] : null,
+            //     className: "enemy"
+            // };
 
-            if (battle_toBeTyped.length - battle_userInput.length <= 40) {
-                battleTextArea.scrollTop = battleTextArea.scrollHeight;
-                battleTextArea.focus();
-            } else {
-                battleTextArea.blur();
-                battleTextArea.focus();
-            }
+            // $("#battle-textarea").highlightWithinTextarea({
+            //     highlight: highlighted
+            // });
+
+            // if (battle_toBeTyped.length - battle_userInput.length <= 40) {
+            //     battleTextArea.scrollTop = battleTextArea.scrollHeight;
+            // } else {
+            //     battleTextArea.blur();
+            // }
+            // battleTextArea.focus();
             enemyWPMSpan.textContent = enemyWPM;
         }
     });
@@ -461,6 +468,39 @@ function battle_stopTimer() {
     clearInterval(battle_secondsPassedCounter);
 }
 
+let lastEnemyInput = 0;
+let lastSelfInput = 0;
+let updateHighlightTimer = null;
+
+function battle_updateHightlight() {
+    updateHighlightTimer = setInterval(() => {
+        if (battle_enemyCorrectInput == lastEnemyInput && battle_correctInput == lastSelfInput) return;
+        lastEnemyInput = battle_enemyCorrectInput;
+        lastSelfInput = battle_correctInput;
+        $("#battle-textarea").highlightWithinTextarea({
+            highlight: highlighted
+        });
+
+        let typedWords = battle_userInput.slice(0, battle_correctInput).trim().split(" ").length;
+        battleTypedWordCount.textContent = typedWords;
+
+
+        if (battle_toBeTyped.length - battle_userInput.length <= 40) {
+            battleTextArea.scrollTop = battleTextArea.scrollHeight;
+        } else {
+            battleTextArea.blur();
+        }
+        battleTextArea.focus();
+    }, 10);
+}
+
+function battle_stopHighlight() {
+    lastEnemyInput = 0;
+    lastSelfInput = 0;
+    updateHighlightTimer = null;
+    clearInterval(updateHighlightTimer);
+}
+
 function blurBattleTyping() {
     battle_typingFocused = false;
 
@@ -505,11 +545,8 @@ let highlighted = [{
     highlight: null,
     className: "wrong"
 }, {
-    highlight: [6, 16],
-    className: "enemy"
-}, {
     highlight: null,
-    className: "default"
+    className: "enemy"
 }];
 
 function handleMultiplayerBattle(uInput) {
@@ -553,22 +590,26 @@ function handleMultiplayerBattle(uInput) {
     let cursorPosition = battle_userInput.length;
     battleTextArea.setSelectionRange(cursorPosition, cursorPosition);
     highlighted = [{
-            highlight: battle_correctInput > 0 ? [0, battle_correctInput] : null,
-            className: "correct"
-        },
-        {
-            highlight: battle_wrongInput > 0 ? [battle_correctInput, battle_correctInput + battle_wrongInput] : null,
-            className: "wrong"
-        },
-        {
-            highlight: battle_enemyCorrectInput > battle_correctInput + battle_wrongInput ? [battle_correctInput + battle_wrongInput, battle_enemyCorrectInput] : null,
-            className: "enemy"
-        }
-    ];
+        highlight: battle_correctInput > 0 ? [0, battle_correctInput] : null,
+        className: "correct"
+    }, {
+        highlight: battle_wrongInput > 0 ? [battle_correctInput, battle_correctInput + battle_wrongInput] : null,
+        className: "wrong"
+    }, highlighted[2]];
+    // highlighted[0] = {
+    //     highlight: battle_correctInput > 0 ? [0, battle_correctInput] : null,
+    //     className: "correct"
+    // };
 
-    $("#battle-textarea").highlightWithinTextarea({
-        highlight: highlighted
-    });
+    // highlighted[1] = {
+    //     highlight: battle_wrongInput > 0 ? [battle_correctInput, battle_correctInput + battle_wrongInput] : null,
+    //     className: "wrong"
+    // };
+    console.log(highlighted);
+
+    // $("#battle-textarea").highlightWithinTextarea({
+    //     highlight: highlighted
+    // });
 
 
     manageBattleTest();
@@ -578,6 +619,7 @@ function handleMultiplayerBattle(uInput) {
         blurBattleTyping();
         battle_typingFinished = true;
         battle_stopTimer();
+        battle_stopHighlight();
 
         let accuracy = battle_totalWrongInput == 0 ? 100 : Math.floor(((battle_toBeTyped.length - battle_totalWrongInput) / battle_toBeTyped.length) * 100);
         let wpm = Math.floor((battle_toBeTyped.length / 5) * (60 / battle_secondsPassed));
@@ -594,17 +636,17 @@ function handleMultiplayerBattle(uInput) {
         battleTextArea.disabled = true;
     }
 
-    let typedWords = battle_userInput.slice(0, battle_correctInput).trim().split(" ").length;
-    battleTypedWordCount.textContent = typedWords;
+    // let typedWords = battle_userInput.slice(0, battle_correctInput).trim().split(" ").length;
+    // battleTypedWordCount.textContent = typedWords;
 
 
-    if (battle_toBeTyped.length - battle_userInput.length <= 40) {
-        battleTextArea.scrollTop = battleTextArea.scrollHeight;
-        battleTextArea.focus();
-    } else {
-        battleTextArea.blur();
-        battleTextArea.focus();
-    }
+    // if (battle_toBeTyped.length - battle_userInput.length <= 40) {
+    //     battleTextArea.scrollTop = battleTextArea.scrollHeight;
+    //     battleTextArea.focus();
+    // } else {
+    //     battleTextArea.blur();
+    //     battleTextArea.focus();
+    // }
 }
 
 function willNext() {
