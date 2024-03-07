@@ -1,7 +1,7 @@
 # keybored
 
 ### Objective
-A project created for imitate the https://www.monkeytype.com UI.
+A project created to imitate the https://www.monkeytype.com UI.
 
 ### Features
 - Multiplayer Mode
